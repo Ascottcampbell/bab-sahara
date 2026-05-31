@@ -1,0 +1,2888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bab Sahara • Plan Your Moroccan Journey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Leaflet (completely free, no API key required) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&amp;family=Inter:wght@300;400;500;600&amp;display=swap');
+        
+        :root {
+            --terracotta: #C45C26;
+            --sand: #E8D5B7;
+            --midnight: #0A1628;
+            --gold: #C5A46E;
+            --deep-red: #8B2E1F;
+        }
+        
+        .moroccan-bg {
+            background: linear-gradient(135deg, #0A1628 0%, #1A2535 100%);
+        }
+        
+        .hero-bg {
+            background-image: linear-gradient(rgba(10, 22, 40, 0.45), rgba(10, 22, 40, 0.65)), url('images/hero-sahara.jpg');
+            background-size: cover;
+            background-position: center 30%;
+        }
+        
+        .section-header {
+            font-family: 'Playfair Display', Georgia, serif;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-logo {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.75rem;
+            letter-spacing: -0.03em;
+        }
+
+        .moroccan-gold {
+            color: #C5A46E;
+        }
+
+        .terracotta {
+            color: #C45C26;
+        }
+
+        .sand-bg {
+            background-color: #F8F1E3;
+        }
+
+        .destination-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .destination-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        .interest-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .interest-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .interest-card.selected {
+            border-color: #C45C26;
+            background-color: #FEF6ED;
+            box-shadow: 0 0 0 3px rgba(196, 92, 38, 0.1);
+        }
+
+        .duration-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .duration-btn.selected {
+            background-color: #C45C26;
+            color: white;
+            border-color: #C45C26;
+            transform: translateY(-1px);
+        }
+
+        .itinerary-day {
+            transition: all 0.2s ease;
+        }
+
+        .map-container {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        .timeline-dot {
+            width: 18px;
+            height: 18px;
+            background: #C45C26;
+            border: 4px solid #F8F1E3;
+        }
+
+        .moroccan-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill-rule='evenodd'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-10V8h-2v16h-4v2h4v4h2v-4h4v-2h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 6v-4H4v4H0v2h4v4h2V8h4V6H6z' fill='%23C45C26' fill-opacity='0.06'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: 60px 60px;
+        }
+
+        .stat-number {
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+
+        .activity-tag {
+            font-size: 0.75rem;
+            padding: 2px 10px;
+            border-radius: 9999px;
+            background-color: #FEF6ED;
+            color: #C45C26;
+            font-weight: 500;
+        }
+
+        .leaflet-popup-content-wrapper {
+            border-radius: 12px;
+            font-family: Inter, system_ui, sans-serif;
+        }
+
+        .nav-scrolled {
+            background-color: rgba(248, 241, 227, 0.95);
+            backdrop-filter: blur(12px);
+        }
+
+        .dramatic-shadow {
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
+        }
+    </style>
+</head>
+<body class="bg-[#F8F1E3] text-[#0A1628] font-sans">
+    <!-- Navigation -->
+    <nav id="nav" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#F8F1E3]/95 backdrop-blur-lg border-b border-[#E8D5B7]">
+        <div class="max-w-screen-2xl mx-auto px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center gap-x-3">
+                    <div class="w-9 h-9 bg-[#C45C26] rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-archway text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="nav-logo font-bold text-3xl tracking-tighter text-[#0A1628]">Bab Sahara</span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center">
+                    <button onclick="scrollToPlanner()" 
+                            class="px-6 py-2.5 bg-[#C45C26] hover:bg-[#A84D20] transition-all text-white rounded-full text-sm font-semibold flex items-center gap-x-2">
+                        <span>Start Planning</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero-bg min-h-screen flex items-center pt-20 relative">
+        <div class="max-w-screen-2xl mx-auto px-8 pt-12 pb-24">
+            <div class="max-w-3xl">
+                <div class="inline-flex items-center gap-x-2 px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full mb-6 border border-white/20">
+                    <div class="w-2 h-2 bg-[#C5A46E] rounded-full animate-pulse"></div>
+                    <span class="text-white/90 text-sm tracking-[1px] font-medium">EST. 2007 • MOROCCO SPECIALISTS</span>
+                </div>
+                
+                <h1 class="text-[92px] leading-[82px] font-bold text-white tracking-tighter section-header mb-4">
+                    BAB SAHARA
+                </h1>
+                
+                <p class="text-4xl text-white/95 tracking-tight mb-4">The gate to Morocco's soul.</p>
+                
+                <p class="max-w-md text-lg text-white/85 mb-10">
+                    Journey beyond the ordinary. Experience ancient medinas, endless dunes, 
+                    and the warm hospitality of a timeless land.
+                </p>
+                
+                <div class="flex items-center gap-x-4">
+                    <button onclick="scrollToPlanner()" 
+                            class="group px-10 py-4 bg-white hover:bg-[#F8F1E3] transition-all text-[#0A1628] rounded-full text-lg font-semibold flex items-center gap-x-3 shadow-xl">
+                        <span>Plan Your Adventure</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-x-8 mt-14 text-white/70">
+                    <div class="flex -space-x-3">
+                        <div class="w-8 h-8 rounded-full bg-cover ring-2 ring-[#0A1628]/40" style="background-image: url('images/portrait-elderly-man.jpg')"></div>
+                        <div class="w-8 h-8 rounded-full bg-cover ring-2 ring-[#0A1628]/40" style="background-image: url('images/portrait-young-woman.jpg')"></div>
+                        <div class="w-8 h-8 rounded-full bg-cover ring-2 ring-[#0A1628]/40" style="background-image: url('images/portrait-berber-man.jpg')"></div>
+                    </div>
+                    <div class="text-sm">
+                        <span class="font-medium text-white">4,872</span> journeys crafted
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scroll indicator -->
+        <div class="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center text-white/60">
+            <span class="text-xs tracking-[2px] mb-1">SCROLL TO BEGIN</span>
+            <i class="fa-solid fa-chevron-down text-lg animate-bounce"></i>
+        </div>
+    </header>
+
+    <!-- Stats Bar -->
+    <div class="border-b border-[#E8D5B7] bg-white">
+        <div class="max-w-screen-2xl mx-auto px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 py-7">
+                <div class="flex items-center gap-x-4 border-r border-[#E8D5B7] last:border-r-0 px-6">
+                    <div class="text-4xl font-semibold stat-number text-[#C45C26]">92</div>
+                    <div class="text-sm leading-tight">Cities, villages<br>&amp; desert camps</div>
+                </div>
+                <div class="flex items-center gap-x-4 border-r border-[#E8D5B7] last:border-r-0 px-6">
+                    <div class="text-4xl font-semibold stat-number text-[#C45C26]">14k+</div>
+                    <div class="text-sm leading-tight">Travelers guided<br>across the Sahara</div>
+                </div>
+                <div class="flex items-center gap-x-4 border-r border-[#E8D5B7] last:border-r-0 px-6">
+                    <div class="text-4xl font-semibold stat-number text-[#C45C26]">48</div>
+                    <div class="text-sm leading-tight">Expert local<br>guides &amp; drivers</div>
+                </div>
+                <div class="flex items-center gap-x-4 px-6">
+                    <div class="text-4xl font-semibold stat-number text-[#C45C26]">4.98</div>
+                    <div class="text-sm leading-tight">Average guest rating<br>out of 5 stars</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inspiration Gallery -->
+    <section id="inspiration" class="max-w-screen-2xl mx-auto px-8 pt-16 pb-12">
+        <div class="flex items-end justify-between mb-8">
+            <div>
+                <div class="uppercase tracking-[3px] text-xs text-[#C45C26] font-semibold mb-2">The Kingdom Awaits</div>
+                <h2 class="section-header text-5xl tracking-tighter">Moments that stay with you</h2>
+            </div>
+            <a href="#planner" class="hidden md:flex items-center gap-x-2 text-sm font-medium text-[#C45C26] hover:text-[#A84D20]">
+                BEGIN YOUR STORY <i class="fa-solid fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            <!-- Gallery images - dramatic and varied -->
+            <div class="group aspect-[4/3] rounded-2xl overflow-hidden relative">
+                <img src="images/camel-caravan.jpg" 
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Camel caravan crossing the Erg Chebbi dunes at sunset in Merzouga, Sahara Desert">
+                <div class="absolute inset-0 bg-gradient-to-b from-black/10 to-black/60"></div>
+                <div class="absolute bottom-4 left-4 text-white">
+                    <div class="text-sm font-medium">Sahara Camel Trek</div>
+                    <div class="text-[10px] opacity-75">Erg Chebbi Dunes</div>
+                </div>
+            </div>
+            
+            <div class="group aspect-[4/3] rounded-2xl overflow-hidden relative">
+                <img src="images/chefchaouen.jpg" 
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Narrow blue-washed alleyway with traditional doors in Chefchaouen, the Blue Pearl of Morocco">
+                <div class="absolute inset-0 bg-gradient-to-b from-black/10 to-black/60"></div>
+                <div class="absolute bottom-4 left-4 text-white">
+                    <div class="text-sm font-medium">Chefchaouen</div>
+                    <div class="text-[10px] opacity-75">The Blue Pearl</div>
+                </div>
+            </div>
+            
+            <div class="group aspect-[4/3] rounded-2xl overflow-hidden relative">
+                <img src="images/marrakech-square.jpg" 
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Bustling Jemaa el-Fna square at dusk in Marrakech with the Koutoubia minaret in the background">
+                <div class="absolute inset-0 bg-gradient-to-b from-black/10 to-black/60"></div>
+                <div class="absolute bottom-4 left-4 text-white">
+                    <div class="text-sm font-medium">Marrakech</div>
+                    <div class="text-[10px] opacity-75">Imperial City</div>
+                </div>
+            </div>
+            
+            <div class="group aspect-[4/3] rounded-2xl overflow-hidden relative">
+                <img src="images/riad-courtyard.jpg" 
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Serene traditional Moroccan riad courtyard with zellige tile fountain and carved cedar wood in Fez">
+                <div class="absolute inset-0 bg-gradient-to-b from-black/10 to-black/60"></div>
+                <div class="absolute bottom-4 left-4 text-white">
+                    <div class="text-sm font-medium">Riad Courtyards</div>
+                    <div class="text-[10px] opacity-75">Fez Medina</div>
+                </div>
+            </div>
+            
+            <div class="group aspect-[4/3] rounded-2xl overflow-hidden relative">
+                <img src="images/atlas-mountains.jpg" 
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Dramatic High Atlas Mountains with traditional Berber villages near Imlil, Morocco">
+                <div class="absolute inset-0 bg-gradient-to-b from-black/10 to-black/60"></div>
+                <div class="absolute bottom-4 left-4 text-white">
+                    <div class="text-sm font-medium">High Atlas Mountains</div>
+                    <div class="text-[10px] opacity-75">Imlil &amp; Toubkal</div>
+                </div>
+            </div>
+            
+            <div class="group aspect-[4/3] rounded-2xl overflow-hidden relative">
+                <img src="images/essaouira.jpg" 
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Historic ramparts and blue fishing boats in the Atlantic harbor of Essaouira, Morocco">
+                <div class="absolute inset-0 bg-gradient-to-b from-black/10 to-black/60"></div>
+                <div class="absolute bottom-4 left-4 text-white">
+                    <div class="text-sm font-medium">Essaouira</div>
+                    <div class="text-[10px] opacity-75">Atlantic Coast</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The Planner Section -->
+    <section id="planner" class="bg-[#0A1628] text-white py-16">
+        <div class="max-w-screen-2xl mx-auto px-8">
+            <div class="flex flex-col items-center text-center mb-12">
+                <div class="uppercase tracking-[3px] text-[#C5A46E] text-xs font-semibold mb-3">YOUR JOURNEY BEGINS HERE</div>
+                <h2 class="section-header text-6xl tracking-tighter mb-4">Design your perfect escape</h2>
+                <p class="max-w-md text-white/70">Tell us where you're coming from, how long you're staying, and what interests you most. We'll craft a personalized itinerary with the right arrival airport, transportation, and day-by-day plan.</p>
+            </div>
+
+            <!-- Planner Interface -->
+            <div class="max-w-5xl mx-auto">
+                <!-- Progress Steps -->
+                <div class="flex items-center justify-center gap-x-3 mb-10">
+                    <div id="step-indicator-1" class="flex items-center gap-x-2 px-5 py-1.5 rounded-full bg-[#C45C26] text-sm font-medium">
+                        <div class="w-5 h-5 rounded-full bg-white text-[#C45C26] flex items-center justify-center text-xs font-bold">1</div>
+                        <span>Origin</span>
+                    </div>
+                    <div class="w-8 h-px bg-white/20"></div>
+                    <div id="step-indicator-2" class="flex items-center gap-x-2 px-5 py-1.5 rounded-full bg-white/5 text-sm font-medium text-white/60">
+                        <div class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">2</div>
+                        <span>Duration</span>
+                    </div>
+                    <div class="w-8 h-px bg-white/20"></div>
+                    <div id="step-indicator-3" class="flex items-center gap-x-2 px-5 py-1.5 rounded-full bg-white/5 text-sm font-medium text-white/60">
+                        <div class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">3</div>
+                        <span>Interests</span>
+                    </div>
+                </div>
+
+                <!-- Step 1: Origin - Where are you coming from? (This is the starting point) -->
+                <div id="step-origin" class="mb-10 p-6 bg-[#121B28] rounded-3xl border-2 border-[#C5A46E]/30 ring-1 ring-white/10">
+                    <div class="flex items-center gap-x-3 mb-4">
+                        <div class="w-7 h-7 rounded-full bg-[#C45C26] flex items-center justify-center text-xs font-bold">1</div>
+                        <h3 class="text-xl font-semibold">Where are you traveling from?</h3>
+                    </div>
+                    <p class="text-white/60 text-sm mb-5">This determines the best arrival airport (especially important for flights from the USA) and shapes your entire itinerary.</p>
+                    
+                    <p class="text-xs text-[#C5A46E] font-medium mb-3">SELECT YOUR DEPARTURE REGION:</p>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3" id="origin-options">
+                        <div onclick="selectOriginById('usa', this)" class="origin-card cursor-pointer border-2 border-white/20 hover:border-[#C5A46E] bg-[#1E2B44] hover:bg-[#253447] rounded-2xl p-5 text-center transition-all text-white">
+                            <div class="text-4xl mb-3">🇺🇸</div>
+                            <div class="font-bold text-lg leading-tight mb-1">United States</div>
+                            <div class="text-sm text-[#C5A46E] font-semibold mb-2">Flying from the USA</div>
+                            <div class="text-xs text-white/60">Recommended: <span class="font-semibold text-[#C5A46E]">CMN</span></div>
+                        </div>
+                        <div onclick="selectOriginById('canada', this)" class="origin-card cursor-pointer border-2 border-white/20 hover:border-[#C5A46E] bg-[#1E2B44] hover:bg-[#253447] rounded-2xl p-5 text-center transition-all text-white">
+                            <div class="text-4xl mb-3">🇨🇦</div>
+                            <div class="font-bold text-lg leading-tight mb-1">Canada</div>
+                            <div class="text-sm text-[#C5A46E] font-semibold mb-2">Flying from Canada</div>
+                            <div class="text-xs text-white/60">Recommended: <span class="font-semibold text-[#C5A46E]">CMN</span></div>
+                        </div>
+                        <div onclick="selectOriginById('uk', this)" class="origin-card cursor-pointer border-2 border-white/20 hover:border-[#C5A46E] bg-[#1E2B44] hover:bg-[#253447] rounded-2xl p-5 text-center transition-all text-white">
+                            <div class="text-4xl mb-3">🇬🇧</div>
+                            <div class="font-bold text-lg leading-tight mb-1">United Kingdom</div>
+                            <div class="text-sm text-[#C5A46E] font-semibold mb-2">Flying from the UK</div>
+                            <div class="text-xs text-white/60">Recommended: <span class="font-semibold text-[#C5A46E]">RAK or CMN</span></div>
+                        </div>
+                        <div onclick="selectOriginById('france', this)" class="origin-card cursor-pointer border-2 border-white/20 hover:border-[#C5A46E] bg-[#1E2B44] hover:bg-[#253447] rounded-2xl p-5 text-center transition-all text-white">
+                            <div class="text-4xl mb-3">🇫🇷</div>
+                            <div class="font-bold text-lg leading-tight mb-1">France</div>
+                            <div class="text-sm text-[#C5A46E] font-semibold mb-2">Flying from France</div>
+                            <div class="text-xs text-white/60">Recommended: <span class="font-semibold text-[#C5A46E]">RAK or CMN</span></div>
+                        </div>
+                        <div onclick="selectOriginById('europe', this)" class="origin-card cursor-pointer border-2 border-white/20 hover:border-[#C5A46E] bg-[#1E2B44] hover:bg-[#253447] rounded-2xl p-5 text-center transition-all text-white">
+                            <div class="text-4xl mb-3">🇪🇺</div>
+                            <div class="font-bold text-lg leading-tight mb-1">Other Europe</div>
+                            <div class="text-sm text-[#C5A46E] font-semibold mb-2">Flying from Europe</div>
+                            <div class="text-xs text-white/60">Recommended: <span class="font-semibold text-[#C5A46E]">Multiple</span></div>
+                        </div>
+                        <div onclick="selectOriginById('world', this)" class="origin-card cursor-pointer border-2 border-white/20 hover:border-[#C5A46E] bg-[#1E2B44] hover:bg-[#253447] rounded-2xl p-5 text-center transition-all text-white">
+                            <div class="text-4xl mb-3">🌍</div>
+                            <div class="font-bold text-lg leading-tight mb-1">Rest of the World</div>
+                            <div class="text-sm text-[#C5A46E] font-semibold mb-2">Flying from elsewhere</div>
+                            <div class="text-xs text-white/60">Recommended: <span class="font-semibold text-[#C5A46E]">CMN</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Self-contained script for Origin step (makes it work even if main script has errors) -->
+                <script>
+                    (function() {
+                        // Minimal self-contained logic for origin selection
+                        window.selectedOrigin = null;
+
+                        window.selectOriginById = function(id, element) {
+                            try {
+                                // Find the full option from the data (defined later, but we can hardcode minimal)
+                                var option = { id: id, label: element.querySelector('.font-bold').textContent.trim() };
+
+                                // Deselect all
+                                document.querySelectorAll('#origin-options .origin-card').forEach(function(el) {
+                                    el.classList.remove('selected', 'border-[#C45C26]', 'bg-[#C45C26]', 'text-white', 'shadow-xl', 'scale-[1.02]');
+                                    el.classList.add('border-white/20', 'bg-[#1E2B44]');
+                                });
+
+                                // Select this one
+                                element.classList.add('selected', 'border-[#C45C26]', 'bg-[#C45C26]', 'text-white', 'shadow-xl', 'scale-[1.02]');
+                                element.classList.remove('border-white/20', 'bg-[#1E2B44]');
+
+                                window.selectedOrigin = option;
+
+                                // Enable Duration step
+                                var durationStep = document.getElementById('step-duration');
+                                if (durationStep) {
+                                    durationStep.classList.remove('opacity-40', 'pointer-events-none');
+                                }
+
+                                // Update progress indicators
+                                var ind1 = document.getElementById('step-indicator-1');
+                                var ind2 = document.getElementById('step-indicator-2');
+                                if (ind1) {
+                                    ind1.classList.remove('bg-white/10');
+                                    ind1.classList.add('bg-[#C45C26]');
+                                }
+                                if (ind2) {
+                                    ind2.classList.remove('bg-white/5', 'text-white/60');
+                                    ind2.classList.add('bg-white/10');
+                                }
+
+                                // Try to enable generate button if the function exists
+                                if (typeof window.updateGenerateButton === 'function') {
+                                    window.updateGenerateButton();
+                                }
+                            } catch(e) {
+                                console.error('Origin selection error:', e);
+                                // Fallback: at least highlight the card
+                                document.querySelectorAll('#origin-options .origin-card').forEach(function(el) {
+                                    el.classList.remove('selected', 'border-[#C45C26]', 'bg-[#C45C26]', 'text-white');
+                                    el.classList.add('border-white/20', 'bg-[#1E2B44]');
+                                });
+                                element.classList.add('selected', 'border-[#C45C26]', 'bg-[#C45C26]', 'text-white');
+                            }
+                        };
+                    })();
+                </script>
+
+                <!-- Step 2: Duration -->
+                <div id="step-duration" class="mb-10 opacity-40 pointer-events-none">
+                    <div class="text-center mb-6">
+                        <h3 class="text-2xl font-semibold mb-1">How long is your stay?</h3>
+                        <p class="text-white/60 text-sm">Choose the length that fits your schedule</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                        <div data-duration="short" onclick="selectDuration('short', this)" class="duration-btn cursor-pointer border border-white/20 hover:border-[#C5A46E] rounded-2xl p-6 text-center group">
+                            <div class="mx-auto w-10 h-10 flex items-center justify-center mb-3 text-[#C5A46E]">
+                                <i class="fa-solid fa-plane fa-2x"></i>
+                            </div>
+                            <div class="font-semibold text-xl">4-6 Days</div>
+                            <div class="text-xs text-white/60 mt-1">Quick Escape</div>
+                            <div class="mt-4 text-[10px] px-3 py-1 bg-white/5 rounded-full inline-block">Short focused trip</div>
+                        </div>
+                        
+                        <div data-duration="medium" onclick="selectDuration('medium', this)" class="duration-btn cursor-pointer border border-white/20 hover:border-[#C5A46E] rounded-2xl p-6 text-center group">
+                            <div class="mx-auto w-10 h-10 flex items-center justify-center mb-3 text-[#C5A46E]">
+                                <i class="fa-solid fa-mountain fa-2x"></i>
+                            </div>
+                            <div class="font-semibold text-xl">7-9 Days</div>
+                            <div class="text-xs text-white/60 mt-1">Classic Journey</div>
+                            <div class="mt-4 text-[10px] px-3 py-1 bg-white/5 rounded-full inline-block">Balanced exploration</div>
+                        </div>
+                        
+                        <div data-duration="long" onclick="selectDuration('long', this)" class="duration-btn cursor-pointer border border-white/20 hover:border-[#C5A46E] rounded-2xl p-6 text-center group">
+                            <div class="mx-auto w-10 h-10 flex items-center justify-center mb-3 text-[#C5A46E]">
+                                <i class="fa-solid fa-globe fa-2x"></i>
+                            </div>
+                            <div class="font-semibold text-xl">10-12 Days</div>
+                            <div class="text-xs text-white/60 mt-1">In-Depth Discovery</div>
+                            <div class="mt-4 text-[10px] px-3 py-1 bg-white/5 rounded-full inline-block">Full experience</div>
+                        </div>
+                        
+                        <div data-duration="epic" onclick="selectDuration('epic', this)" class="duration-btn cursor-pointer border border-white/20 hover:border-[#C5A46E] rounded-2xl p-6 text-center group">
+                            <div class="mx-auto w-10 h-10 flex items-center justify-center mb-3 text-[#C5A46E]">
+                                <i class="fa-solid fa-infinity fa-2x"></i>
+                            </div>
+                            <div class="font-semibold text-xl">13+ Days</div>
+                            <div class="text-xs text-white/60 mt-1">Grand Expedition</div>
+                            <div class="mt-4 text-[10px] px-3 py-1 bg-white/5 rounded-full inline-block">Extended immersion</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Self-contained script for Duration step (makes buttons work independently) -->
+                <script>
+                    (function() {
+                        window.selectedDuration = null;
+
+                        window.selectDuration = function(duration, element) {
+                            try {
+                                // Deselect all
+                                document.querySelectorAll('.duration-btn').forEach(function(el) {
+                                    el.classList.remove('selected', 'border-[#C5A46E]', 'bg-[#C45C26]', 'text-white');
+                                    el.classList.add('border-white/20');
+                                });
+
+                                // Select current
+                                element.classList.add('selected', 'border-[#C5A46E]', 'bg-[#C45C26]', 'text-white');
+                                element.classList.remove('border-white/20');
+
+                                window.selectedDuration = duration;
+
+                                // Enable Interests step
+                                var interestsStep = document.getElementById('step-interests');
+                                if (interestsStep) {
+                                    interestsStep.classList.remove('opacity-40', 'pointer-events-none');
+                                }
+
+                                // Update progress indicators
+                                var ind2 = document.getElementById('step-indicator-2');
+                                var ind3 = document.getElementById('step-indicator-3');
+                                if (ind2) {
+                                    ind2.classList.remove('bg-white/5', 'text-white/60');
+                                    ind2.classList.add('bg-[#C45C26]');
+                                }
+                                if (ind3) {
+                                    ind3.classList.remove('bg-white/5', 'text-white/60');
+                                    ind3.classList.add('bg-white/10');
+                                }
+
+                                // Try to enable generate button if the function exists
+                                if (typeof window.updateGenerateButton === 'function') {
+                                    window.updateGenerateButton();
+                                }
+                            } catch(e) {
+                                console.error('Duration selection error:', e);
+                                // Fallback visual selection
+                                document.querySelectorAll('.duration-btn').forEach(function(el) {
+                                    el.classList.remove('selected', 'border-[#C5A46E]', 'bg-[#C45C26]', 'text-white');
+                                    el.classList.add('border-white/20');
+                                });
+                                element.classList.add('selected', 'border-[#C5A46E]', 'bg-[#C45C26]', 'text-white');
+                            }
+                        };
+                    })();
+                </script>
+
+                <!-- Step 2: Interests -->
+                <div id="step-interests" class="opacity-40 pointer-events-none transition-opacity">
+                    <div class="text-center mb-6">
+                        <h3 class="text-2xl font-semibold mb-1">What do you want to explore?</h3>
+                        <p class="text-white/60 text-sm">Select all that call to you — we'll tailor the route accordingly</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+                        <div onclick="selectInterest('heritage', this)" class="interest-card border border-white/20 rounded-2xl p-5 flex gap-x-4 items-start">
+                            <div class="text-3xl mt-0.5">🏛️</div>
+                            <div>
+                                <div class="font-semibold">Imperial Cities</div>
+                                <div class="text-xs text-white/60 mt-0.5">Marrakech • Fez • Meknes • Rabat</div>
+                            </div>
+                        </div>
+                        
+                        <div onclick="selectInterest('desert', this)" class="interest-card border border-white/20 rounded-2xl p-5 flex gap-x-4 items-start">
+                            <div class="text-3xl mt-0.5">🏜️</div>
+                            <div>
+                                <div class="font-semibold">Sahara and Dunes</div>
+                                <div class="text-xs text-white/60 mt-0.5">Merzouga • Erg Chebbi • Camel treks</div>
+                            </div>
+                        </div>
+                        
+                        <div onclick="selectInterest('coast', this)" class="interest-card border border-white/20 rounded-2xl p-5 flex gap-x-4 items-start">
+                            <div class="text-3xl mt-0.5">🌊</div>
+                            <div>
+                                <div class="font-semibold">Atlantic Coast</div>
+                                <div class="text-xs text-white/60 mt-0.5">Essaouira • Agadir • Surf &amp; seafood</div>
+                            </div>
+                        </div>
+                        
+                        <div onclick="selectInterest('mountains', this)" class="interest-card border border-white/20 rounded-2xl p-5 flex gap-x-4 items-start">
+                            <div class="text-3xl mt-0.5">⛰️</div>
+                            <div>
+                                <div class="font-semibold">Atlas and Rif Mountains</div>
+                                <div class="text-xs text-white/60 mt-0.5">Imlil • Chefchaouen • High Atlas passes</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Self-contained script for Interests step (makes cards clickable independently) -->
+                <script>
+                    (function() {
+                        window.selectedInterest = null;
+
+                        window.selectInterest = function(interest, element) {
+                            try {
+                                // Deselect all
+                                document.querySelectorAll('#step-interests .interest-card').forEach(function(el) {
+                                    el.classList.remove('selected', 'border-[#C45C26]', 'bg-[#FEF6ED]');
+                                    el.classList.add('border-white/20');
+                                });
+
+                                // Select the clicked one
+                                element.classList.add('selected', 'border-[#C45C26]', 'bg-[#FEF6ED]');
+                                element.classList.remove('border-white/20');
+
+                                window.selectedInterest = interest;
+
+                                // Try to enable the generate button
+                                if (typeof window.updateGenerateButton === 'function') {
+                                    window.updateGenerateButton();
+                                }
+                            } catch(e) {
+                                console.error('Interest selection error:', e);
+                                // Fallback visual
+                                document.querySelectorAll('#step-interests .interest-card').forEach(function(el) {
+                                    el.classList.remove('selected', 'border-[#C45C26]', 'bg-[#FEF6ED]');
+                                    el.classList.add('border-white/20');
+                                });
+                                element.classList.add('selected', 'border-[#C45C26]', 'bg-[#FEF6ED]');
+                            }
+                        };
+                    })();
+                </script>
+
+                <!-- Generate Button -->
+                <div class="mt-10 text-center">
+                    <button onclick="generateItinerary()" id="generate-btn"
+                            class="disabled:opacity-50 disabled:cursor-not-allowed px-14 py-4 text-lg font-semibold bg-[#C45C26] hover:bg-[#A84D20] transition-all rounded-full flex items-center gap-x-3 mx-auto shadow-xl disabled:shadow-none"
+                            disabled>
+                        <i class="fa-solid fa-magic mr-1"></i>
+                        <span id="generate-text">Craft My Itinerary</span>
+                    </button>
+                    <p class="text-xs text-white/50 mt-3">Takes just a moment • Completely personalized</p>
+                </div>
+
+                <!-- New Trip reset function -->
+                <script>
+                    window.startNewTrip = function() {
+                        const results = document.getElementById('results');
+                        if (results) results.classList.add('hidden');
+
+                        const planner = document.getElementById('planner');
+                        if (planner) planner.style.display = '';
+
+                        window.selectedOrigin = null;
+                        window.selectedDuration = null;
+                        window.selectedInterest = null;
+
+                        document.querySelectorAll('.origin-card, .duration-btn, .interest-card').forEach(el => {
+                            el.classList.remove('selected', 'border-[#C45C26]', 'bg-[#C45C26]', 'text-white', 'shadow-xl', 'scale-[1.02]', 'bg-[#FEF6ED]');
+                            if (el.classList.contains('origin-card') || el.classList.contains('interest-card')) {
+                                el.classList.add('border-white/20', 'bg-[#1E2B44]');
+                            } else {
+                                el.classList.add('border-white/20');
+                            }
+                        });
+
+                        document.querySelectorAll('[id^="step-indicator-"]').forEach((el, index) => {
+                            el.classList.remove('bg-[#C45C26]');
+                            if (index === 0) {
+                                el.classList.add('bg-[#C45C26]');
+                            } else {
+                                el.classList.add('bg-white/5', 'text-white/60');
+                            }
+                        });
+
+                        const btn = document.getElementById('generate-btn');
+                        if (btn) btn.disabled = true;
+
+                        const durationStep = document.getElementById('step-duration');
+                        if (durationStep) durationStep.classList.add('opacity-40', 'pointer-events-none');
+
+                        const interestsStep = document.getElementById('step-interests');
+                        if (interestsStep) interestsStep.classList.add('opacity-40', 'pointer-events-none');
+
+                        if (planner) planner.scrollIntoView({ behavior: 'smooth' });
+                    };
+                </script>
+
+                <!-- New Trip reset function -->
+                <script>
+                    window.startNewTrip = function() {
+                        const results = document.getElementById('results');
+                        if (results) results.classList.add('hidden');
+
+                        const planner = document.getElementById('planner');
+                        if (planner) planner.style.display = '';
+
+                        window.selectedOrigin = null;
+                        window.selectedDuration = null;
+                        window.selectedInterest = null;
+
+                        document.querySelectorAll('.origin-card, .duration-btn, .interest-card').forEach(el => {
+                            el.classList.remove('selected', 'border-[#C45C26]', 'bg-[#C45C26]', 'text-white', 'shadow-xl', 'scale-[1.02]', 'bg-[#FEF6ED]');
+                            if (el.classList.contains('origin-card') || el.classList.contains('interest-card')) {
+                                el.classList.add('border-white/20', 'bg-[#1E2B44]');
+                            } else {
+                                el.classList.add('border-white/20');
+                            }
+                        });
+
+                        document.querySelectorAll('[id^="step-indicator-"]').forEach((el, index) => {
+                            el.classList.remove('bg-[#C45C26]');
+                            if (index === 0) {
+                                el.classList.add('bg-[#C45C26]');
+                            } else {
+                                el.classList.add('bg-white/5', 'text-white/60');
+                            }
+                        });
+
+                        const btn = document.getElementById('generate-btn');
+                        if (btn) btn.disabled = true;
+
+                        const durationStep = document.getElementById('step-duration');
+                        if (durationStep) durationStep.classList.add('opacity-40', 'pointer-events-none');
+
+                        const interestsStep = document.getElementById('step-interests');
+                        if (interestsStep) interestsStep.classList.add('opacity-40', 'pointer-events-none');
+
+                        if (planner) planner.scrollIntoView({ behavior: 'smooth' });
+                    };
+                </script>
+
+                <!-- Robust Map + City Coordinates helpers (for accurate routes) -->
+                <script>
+                    const cityCoords = {
+                        'Casablanca': [33.5731, -7.5898],
+                        'Rabat': [34.0209, -6.8416],
+                        'Fez': [34.0331, -5.0003],
+                        'Meknes': [33.8935, -5.5473],
+                        'Marrakech': [31.6295, -7.9811],
+                        'Ouarzazate': [30.9335, -6.9370],
+                        'Merzouga': [31.1015, -4.0116],
+                        'Errachidia': [31.9314, -4.4264],
+                        'Bouarfa': [32.53, -1.96],
+                        'Beni Mellal': [32.3373, -6.3498],
+                        'Imilchil': [32.15, -5.683],
+                        'Khenifra': [32.9333, -5.6667],
+                        'Ifrane': [33.5333, -5.1167],
+                        'Ouezzane': [34.8, -5.6],
+                        'Chefchaouen': [35.1715, -5.2699],
+                        'Tetouan': [35.5785, -5.3684],
+                        'Tangiers': [35.7595, -5.8339],
+                        'Essaouira': [31.5085, -9.7595],
+                        'Agadir': [30.4278, -9.5981],
+                        'Ceuta (Spain)': [35.889, -5.321]
+                    };
+
+                    window.getCityCoords = function(name) {
+                        const clean = (name || '').split(' → ')[0].trim();
+                        return cityCoords[clean] || [31.5, -6.5];
+                    };
+
+                    // NOTE: The actual working map logic lives in a self-contained block inside
+                    // the main generation IIFE (search for "SELF-CONTAINED MAP").
+                    // The functions below are only kept for the city coordinate lookup used by
+                    // the itinerary builder. Do not add new map code here.
+
+                    let directionsVisible = false; // legacy, harmless
+
+                    // City coordinate lookup - REQUIRED by the generator inside the IIFE.
+                    // The self-contained map no longer depends on any of the old map helpers.
+                </script>
+
+                <!-- Self-contained reliable generator for the Craft My Itinerary button -->
+                <!-- ============================================================ -->
+                <!-- THIS IS THE AUTHORITATIVE GENERATION LOGIC                 -->
+                <!-- All day-by-day, transportation, tips, and map logic lives  -->
+                <!-- inside this IIFE. Do not add competing global builders.    -->
+                <!-- ============================================================ -->
+                <!--
+                    MAP PRESERVATION NOTICE (added 2026):
+                    The interactive journey map is 100% self-contained inside this IIFE
+                    as the function __babSahara_initJourneyMap.
+                    It was made this way after repeated corruption from global map code.
+                    DO NOT move the map logic outside this closure.
+                    DO NOT re-introduce any global initializeMap / drawOSRMRoute etc.
+                    The only safe place for map changes is inside __babSahara_initJourneyMap.
+                -->
+                <script>
+                    (function() {
+                        // Accurate implementation following user's exact rules
+                        function buildCustomItinerary(duration, interest, origin) {
+                            const days = [];
+                            const locations = [];
+                            const isNorthAmerica = origin && (origin.id === 'usa' || origin.id === 'canada');
+
+                            let dayNum = 1;
+                            const addDay = (title, loc, morning, afternoon, evening, tags = []) => {
+                                days.push({ day: dayNum++, title, location: loc, morning, afternoon, evening, tags: tags.length ? tags : ["Exploration"] });
+                            };
+
+                            const pushLoc = (name) => {
+                                const coords = getCityCoords(name);
+                                locations.push({ id: name.toLowerCase().replace(/[^a-z]/g,''), name, lat: coords[0], lng: coords[1], type: 'city' });
+                            };
+
+                            // The first city of the actual tour/ground loop (not the arrival airport day).
+                            // We will return here at the end instead of the origin airport.
+                            let tourStartCity = null;
+
+                            if (interest === 'heritage') {
+                                // Imperial Cities - exact per your spec
+                                let baseRoute = [];
+                                let daysPerCity = 1;
+
+                                if (duration === 'short') {
+                                    baseRoute = ['Rabat', 'Fez'];
+                                    daysPerCity = 2; // ~4-5 days total with arrival/return
+                                } else if (duration === 'medium') {
+                                    baseRoute = ['Rabat', 'Fez', 'Meknes'];
+                                    daysPerCity = 2; // ~7-8 days
+                                } else if (duration === 'long') {
+                                    baseRoute = ['Rabat', 'Fez', 'Meknes', 'Marrakech'];
+                                    daysPerCity = 2; // 10-12 days with 2 per city + arrival/return
+                                } else {
+                                    baseRoute = ['Rabat', 'Fez', 'Meknes', 'Marrakech', 'Ouarzazate'];
+                                    daysPerCity = 2; // 13+ days
+                                }
+
+                                tourStartCity = baseRoute[0]; // First city of the Imperial Cities tour loop (e.g. Rabat)
+
+                                if (isNorthAmerica) {
+                                    addDay("Arrival in Casablanca", "Casablanca", "Arrive at CMN. Clear immigration.", "Transfer to Rabat.", "Settle in.", ["Arrival"]);
+                                    pushLoc("Casablanca");
+                                }
+
+                                baseRoute.forEach(city => {
+                                    for (let i = 0; i < daysPerCity; i++) {
+                                        const suffix = daysPerCity > 1 ? (i === 0 ? " Exploration" : " Deep Dive") : "";
+                                        addDay(city + suffix, city, 
+                                            `Arrive and settle in ${city}.`, 
+                                            i === 0 ? "Visit main monuments and medina." : "Souks, photography, and local experiences.", 
+                                            "Traditional dinner.", ["Heritage"]);
+                                        pushLoc(city);
+                                    }
+                                });
+
+                                // For all origins (including North America), loop back to the first tour city instead of forcing airport return
+                                if (tourStartCity) {
+                                    addDay(`Return to ${tourStartCity} for Departure`, tourStartCity, 
+                                        `Travel back to ${tourStartCity} (your Imperial Cities tour origin).`, 
+                                        "Afternoon: Free time for final shopping or a relaxed coffee.", 
+                                        "Evening: Farewell dinner. Departure advice: confirm flight, pack carry-on liquids per TSA/ security rules, arrange riad transfer to the airport the night before or early (budget 3 hours at CMN).", ["Departure"]);
+                                    pushLoc(tourStartCity);
+                                }
+
+                            } else if (interest === 'mountains') {
+                                let route = [];
+                                if (duration === 'short') route = ['Beni Mellal', 'Imilchil', 'Beni Mellal'];
+                                else if (duration === 'medium') route = ['Beni Mellal', 'Imilchil', 'Khenifra', 'Ifrane', 'Fez'];
+                                else if (duration === 'long') route = ['Beni Mellal', 'Imilchil', 'Khenifra', 'Ifrane', 'Ouezzane', 'Chefchaouen'];
+                                else route = ['Beni Mellal', 'Imilchil', 'Khenifra', 'Ifrane', 'Fez', 'Ouezzane', 'Chefchaouen', 'Tetouan'];
+
+                                tourStartCity = route[0]; // First city of the mountains tour (always Beni Mellal)
+
+                                if (isNorthAmerica) {
+                                    addDay("Arrival in Casablanca", "Casablanca", "Arrive at CMN. Clear immigration and transfer.", "Begin scenic journey toward the Middle Atlas.", "Settle in and prepare for mountain adventure.", ["Arrival"]);
+                                    pushLoc("Casablanca");
+                                }
+
+                                if (duration === 'short') {
+                                    // 4-6 day Atlas short - action oriented with researched transport notes
+                                    addDay("Beni Mellal Exploration", "Beni Mellal", 
+                                        "Arrive and settle. Morning: Wander the lively medina and visit the historic Kasbah of Beni Mellal for panoramic views.", 
+                                        "Afternoon: Arrange a grand taxi or private driver for a half-day trip to Bin El Ouidane reservoir (beautiful lake and dam views). Hike short trails.", 
+                                        "Evening: Traditional Berber dinner with local specialties. Discuss tomorrow's mountain leg with your driver.", ["Mountains"]);
+                                    pushLoc("Beni Mellal");
+
+                                    addDay("Imilchil Lakes & Villages", "Imilchil", 
+                                        "Early start: Private driver or rented 4x4/ sturdy car for the scenic 4-6 hour winding drive over the Atlas (R317 via El Ksiba). Stop for photos at high passes.", 
+                                        "Explore the famous twin lakes (Tislit and Isli) with easy hikes around the shores. Visit nearby Berber villages and learn about local traditions (famous for the annual Marriage Festival in Sept).", 
+                                        "Dinner at a local auberge with mountain views. Stargazing if clear.", ["Mountains"]);
+                                    pushLoc("Imilchil");
+
+                                    addDay("Return to Beni Mellal for Departure", "Beni Mellal", 
+                                        "Morning drive back to Beni Mellal (same scenic route, different views).", 
+                                        "Afternoon: Free time for last-minute souk shopping or relaxing by the river. Optional short hike in the nearby hills.", 
+                                        "Evening: Farewell dinner. Prepare for departure: confirm flight times and complete online check-in, pack all liquids/gels in a clear quart-size bag, arrange reliable airport transfer (private driver from your riad is strongly recommended). Allow at least 3 hours at the airport.", ["Departure"]);
+                                    pushLoc("Beni Mellal");
+                                } else {
+                                    // Longer routes keep improved but slightly more general action descriptions
+                                    route.forEach((city, idx) => {
+                                        const isFirst = idx === 0;
+                                        const action = isFirst ? "Settle in and explore the gateway town. " : "";
+                                        addDay(city, city, 
+                                            `${action}Morning exploration of the medina and local market.`, 
+                                            "Hiking in surrounding valleys or Berber villages. Scenic drives or short treks with local guide if desired.", 
+                                            "Dinner featuring regional dishes and mint tea.", ["Mountains"]);
+                                        pushLoc(city);
+                                    });
+                                }
+
+                                // Loop back to the first city of the tour instead of "origin airport"
+                                if (tourStartCity) {
+                                    addDay(`Return to ${tourStartCity} for Departure`, tourStartCity, 
+                                        `Morning travel back to ${tourStartCity} (the starting point of your mountain adventure).`, 
+                                        "Afternoon: Free time for last-minute shopping, repacking, or a final coffee with mountain views.", 
+                                        "Evening: Farewell dinner. Brief departure prep: double-check flight status, ensure passport + tickets are easily accessible, confirm your riad can arrange an early transfer to the airport (CMN or RAK). Budget extra time for mountain roads.", ["Departure"]);
+                                    pushLoc(tourStartCity);
+                                }
+
+                            } else if (interest === 'desert') {
+                                let route = ['Marrakech', 'Ouarzazate', 'Merzouga'];
+                                if (duration === 'medium') route = ['Marrakech', 'Ouarzazate', 'Merzouga', 'Errachidia'];
+                                if (duration === 'long' || duration === 'epic') route = ['Marrakech', 'Ouarzazate', 'Merzouga', 'Errachidia', 'Bouarfa'];
+
+                                tourStartCity = route[0]; // First city of the Sahara tour (Marrakech)
+
+                                if (isNorthAmerica) {
+                                    addDay("Arrival in Casablanca", "Casablanca", "Arrive at CMN.", "Transfer to Marrakech.", "Settle in.", ["Arrival"]);
+                                    pushLoc("Casablanca");
+                                } else {
+                                    addDay("Arrival in Marrakech", "Marrakech", "Arrive and check into riad.", "Medina exploration.", "Dinner.", ["Arrival"]);
+                                    pushLoc("Marrakech");
+                                }
+
+                                route.slice(1).forEach(city => {
+                                    addDay(city, city, `Travel to ${city}.`, "Explore the area.", "Dinner.", ["Desert"]);
+                                    pushLoc(city);
+                                });
+
+                                // Loop back to the first city of the tour (Marrakech) instead of origin airport
+                                if (tourStartCity) {
+                                    addDay(`Return to ${tourStartCity} for Departure`, tourStartCity, 
+                                        `Travel back to ${tourStartCity} (your Sahara tour origin).`, 
+                                        "Afternoon free for last-minute shopping in the medina or relaxing at a café.", 
+                                        "Evening: Farewell dinner. Departure prep tips: confirm your flight, pack a change of clothes + medications in carry-on, arrange riad transfer to the airport (allow 3 hours at RAK or CMN, traffic can be heavy).", ["Departure"]);
+                                    pushLoc(tourStartCity);
+                                }
+
+                            } else if (interest === 'coast') {
+                                let route = ['Casablanca', 'Essaouira', 'Agadir'];
+                                if (duration === 'medium') route = ['Casablanca', 'Rabat', 'Essaouira', 'Agadir'];
+                                if (duration === 'long') route = ['Casablanca', 'Rabat', 'Essaouira', 'Agadir', 'Tangiers'];
+                                if (duration === 'epic') route = ['Casablanca', 'Rabat', 'Essaouira', 'Agadir', 'Tangiers', 'Ceuta (Spain)', 'Tetouan'];
+
+                                tourStartCity = route[0]; // First city of the Atlantic Coast tour
+
+                                if (isNorthAmerica) {
+                                    addDay("Arrival in Casablanca", "Casablanca", "Arrive at CMN.", "Explore the city.", "Dinner.", ["Arrival"]);
+                                    pushLoc("Casablanca");
+                                }
+
+                                route.slice(isNorthAmerica ? 1 : 0).forEach(city => {
+                                    addDay(city, city, `Travel to ${city}.`, "Coastal exploration.", "Dinner.", ["Coast"]);
+                                    pushLoc(city);
+                                });
+
+                                // Loop back to the first city of the tour instead of "origin airport"
+                                if (tourStartCity) {
+                                    addDay(`Return to ${tourStartCity} for Departure`, tourStartCity, 
+                                        `Travel back to ${tourStartCity} (your coastal tour starting point).`, 
+                                        "Afternoon: Time for final beach stroll, souvenir shopping, or rest.", 
+                                        "Evening: Farewell dinner. Prepare for departure: verify flight details, pack liquids appropriately, request early airport transfer from your riad (plan for 3 hours at the airport). Safe travels!", ["Departure"]);
+                                    pushLoc(tourStartCity);
+                                }
+                            }
+
+                            // Ensure we reach the target number of days for the selected length
+                            const targetDaysMap = { 'short': 5, 'medium': 8, 'long': 11, 'epic': 14 };
+                            const target = targetDaysMap[duration] || 8;
+
+                            const lastCity = days.length > 0 ? days[days.length - 1].location : 'your last stop';
+
+                            while (dayNum < target) {
+                                addDay(`Free / Exploration Day in ${lastCity}`, lastCity, 
+                                    "Relaxed time to enjoy the destination at your own pace.", 
+                                    "Optional activities, shopping, or rest.", 
+                                    "Dinner at leisure.", ["Leisure"]);
+                                pushLoc(lastCity);
+                            }
+
+                            // === Self-contained generators for transportation & tips (reliable, per-itinerary) ===
+                            // Enhanced with real Morocco transport research (ONCF trains to Beni Mellal, grands taxis vs private drivers for Atlas legs)
+                            const transportation = [];
+                            const detailedTransport = [];
+                            const tips = [];
+                            const facts = [];
+
+                            const usesCMN = isNorthAmerica;
+                            const isUKorEurope = origin && (origin.id === 'uk' || origin.id === 'france' || origin.id === 'europe');
+                            const arrivalNote = isUKorEurope ? "Marrakech (RAK) recommended for Atlas access" : (usesCMN ? "Casablanca (CMN) best long-haul" : "your gateway city");
+
+                            // Strong base recommendations
+                            transportation.push({
+                                icon: "fa-plane",
+                                title: "International Arrival",
+                                desc: `Fly into ${arrivalNote}. UK/Europe travelers often prefer RAK for easier onward connections to the mountains.`
+                            });
+
+                            // === Atlas-specific (your 4-6 day test case) + general ===
+                            const routeCities = locations.map(l => l.name);
+                            const isMountainRoute = routeCities.some(c => 
+                                c.includes('Beni Mellal') || c.includes('Imilchil') || c.includes('Ifrane') || 
+                                c.includes('Khenifra') || c.includes('Chefchaouen')
+                            );
+
+                            if (isMountainRoute) {
+                                transportation.push({
+                                    icon: "fa-train",
+                                    title: "Train to Atlas Gateway (Beni Mellal)",
+                                    desc: "Excellent ONCF trains run from Marrakech, Fez, and Casablanca to Beni Mellal (3–6 hrs, ~150–300 MAD / $15–30). Book at oncf.ma or station. From RAK airport: taxi + train combo."
+                                });
+                                transportation.push({
+                                    icon: "fa-car",
+                                    title: "Mountain Legs (Beni Mellal ↔ Imilchil)",
+                                    desc: "No direct public luxury buses or trains into the high mountains. Private driver or rented 4x4/SUV is the best and most popular option (4–6+ hrs scenic R317 road, ~500–1,500 MAD / $50–150 one way for the vehicle). Grands taxis (shared) from Beni Mellal gare routière are cheap but infrequent and basic."
+                                });
+                            } else if (routeCities.some(c => c.includes('Fez') || c.includes('Rabat'))) {
+                                transportation.push({
+                                    icon: "fa-train",
+                                    title: "ONCF First-Class Trains",
+                                    desc: "Fast, comfortable, reliable trains connect major cities. Highly recommended between Fez, Rabat, Marrakech."
+                                });
+                            }
+
+                            if (routeCities.some(c => c.includes('Merzouga'))) {
+                                transportation.push({
+                                    icon: "fa-car",
+                                    title: "Sahara Transfers",
+                                    desc: "Private 4x4 + driver (standard recommendation). Shared tours from riads also common. Public transport does not reach the dunes."
+                                });
+                            }
+
+                            transportation.push({
+                                icon: "fa-taxi",
+                                title: "Local Movement & Guides",
+                                desc: "Petits taxis in cities, grands taxis for shorter hops. For Imilchil lakes or remote hikes, hire a local guide + vehicle."
+                            });
+
+                            // === Detailed legs (Atlas mountain focus using research) ===
+                            if (isMountainRoute && routeCities.includes('Beni Mellal')) {
+                                detailedTransport.push({
+                                    from: "Beni Mellal",
+                                    to: "Imilchil (High Atlas Lakes)",
+                                    options: [
+                                        {
+                                            mode: "Private Driver or Rented 4x4 (Recommended)",
+                                            duration: "4–6+ hours",
+                                            cost: "500–1,500 MAD (~$50–150 USD) one way for vehicle",
+                                            where: "Arrange at Beni Mellal hotels, gare routière, or pre-book from Marrakech riads. Local drivers know the R317 well.",
+                                            notes: "Best experience — flexible stops at viewpoints, lakes, and villages. 2WD possible in good weather; 4x4 preferred for comfort on twists and variable pavement."
+                                        },
+                                        {
+                                            mode: "Grands Taxi (Shared - Budget)",
+                                            duration: "5–7 hours (waits for full taxi)",
+                                            cost: "100–350 MAD (~$10–35 USD) per person",
+                                            where: "Beni Mellal main taxi station. Ask for Imilchil / El Ksiba.",
+                                            notes: "Authentic and cheap for locals, but basic, crowded, and unpredictable. Fine if you're adventurous and traveling light."
+                                        }
+                                    ]
+                                });
+                            }
+
+                            // === Rich Travel Tips (actionable & researched) ===
+                            tips.push("Dress in layers for the Atlas — sunny days but cold nights and fast-changing mountain weather.");
+                            tips.push("For the Beni Mellal to Imilchil leg, private driver or rental car is strongly preferred over shared grands taxis for safety, comfort, and photo stops.");
+                            tips.push("Hire a local guide for hikes to the lakes or Berber villages around Imilchil — they know the best trails and can share culture.");
+                            tips.push("Mountain roads (R317 etc.) are scenic but winding with occasional rough patches. Travel only in daylight and check conditions locally.");
+                            tips.push("Carry cash (MAD) — ATMs are limited beyond Beni Mellal, Ifrane, or larger towns.");
+                            tips.push("Bargain politely for taxis, guides, and souvenirs. A friendly attitude helps everywhere in Morocco.");
+
+                            if (interest === 'desert') {
+                                tips.push("Pack a scarf and warm layers for the Sahara nights. Pre-book camps in high season (Oct–Apr).");
+                            }
+                            if (interest === 'heritage') {
+                                tips.push("An official guide in Fez is one of the best investments — the medina is complex and the history comes alive.");
+                            }
+                            if (duration === 'long' || duration === 'epic') {
+                                tips.push("Get a local SIM (Maroc Telecom or Orange) for data in remote mountain areas.");
+                            }
+
+                            // === Quick Facts ===
+                            const targetDays = { 'short': 5, 'medium': 8, 'long': 11, 'epic': 14 }[duration] || 8;
+                            facts.push(
+                                { label: "Duration", value: `${targetDays} days` },
+                                { label: "Main Stops", value: locations.length },
+                                { label: "Best Season", value: "Mar–May & Sep–Nov" },
+                                { label: "Currency", value: "Moroccan Dirham (MAD)" },
+                                { label: "Languages", value: "Arabic, French, Berber" },
+                                { label: "Time Zone", value: "UTC+1" }
+                            );
+
+                            return { days, locations, transportation, detailedTransport, tips, facts };
+                        }
+
+                        // Reliable generateItinerary
+                        window.generateItinerary = function() {
+                            try {
+                                // Read current selections directly from the DOM for maximum reliability
+                                const selectedDurationCard = document.querySelector('#step-duration .duration-btn.selected');
+                                const selectedInterestCard = document.querySelector('#step-interests .interest-card.selected');
+
+                                const duration = selectedDurationCard ? selectedDurationCard.dataset.duration : window.selectedDuration;
+                                const interest = selectedInterestCard ? selectedInterestCard.getAttribute('onclick').match(/selectInterest\('([^']+)'/)?.[1] : window.selectedInterest;
+
+                                if (!window.selectedOrigin || !duration || !interest) {
+                                    alert("Please complete all three steps first.");
+                                    return;
+                                }
+
+                                const data = buildCustomItinerary(duration, interest, window.selectedOrigin);
+
+                                const planner = document.getElementById('planner');
+                                if (planner) planner.style.display = 'none';
+
+                                const results = document.getElementById('results');
+                                if (results) {
+                                    results.classList.remove('hidden');
+                                    results.scrollIntoView({ behavior: 'smooth' });
+                                }
+
+                                const titleEl = document.getElementById('results-title');
+                                if (titleEl) {
+                                    const durLabel = window.durationLabels?.[duration] || duration;
+                                    titleEl.textContent = durLabel + ' in Morocco';
+                                }
+
+                                const subEl = document.getElementById('results-subtitle');
+                                if (subEl) {
+                                    const intLabel = window.interestLabels?.[interest] || interest;
+                                    subEl.textContent = 'A personalized journey focused on ' + intLabel.toLowerCase();
+                                }
+
+                                const daysContainer = document.getElementById('itinerary-days');
+                                if (daysContainer) {
+                                    // Simple sequence of cities (deduplicated, in travel order)
+                                    const citiesInOrder = [];
+                                    const seen = new Set();
+                                    (data.locations || []).forEach(loc => {
+                                        if (!seen.has(loc.name)) {
+                                            seen.add(loc.name);
+                                            citiesInOrder.push(loc.name);
+                                        }
+                                    });
+
+                                    if (citiesInOrder.length > 0) {
+                                        // === Route Summary + Travel Data ===
+                                        const travelEstimates = {
+                                            "Casablanca-Rabat": { time: "1h", distance: "90 km" },
+                                            "Rabat-Fez": { time: "3h", distance: "280 km" },
+                                            "Fez-Meknes": { time: "1h", distance: "60 km" },
+                                            "Meknes-Marrakech": { time: "4.5h", distance: "380 km" },
+                                            "Marrakech-Ouarzazate": { time: "4h", distance: "200 km" },
+                                            "Ouarzazate-Merzouga": { time: "6h", distance: "350 km" },
+                                            "Merzouga-Errachidia": { time: "3.5h", distance: "180 km" },
+                                            "Errachidia-Bouarfa": { time: "4h", distance: "220 km" },
+                                            "Beni Mellal-Imilchil": { time: "5h", distance: "160 km" },
+                                            "Imilchil-Khenifra": { time: "3h", distance: "120 km" },
+                                            "Khenifra-Ifrane": { time: "2h", distance: "90 km" },
+                                            "Ifrane-Fez": { time: "1.5h", distance: "70 km" },
+                                            "Fez-Ouezzane": { time: "3h", distance: "150 km" },
+                                            "Ouezzane-Chefchaouen": { time: "2h", distance: "80 km" },
+                                            "Chefchaouen-Tetouan": { time: "1.5h", distance: "60 km" },
+                                            "Tetouan-Tangiers": { time: "1h", distance: "40 km" },
+                                            "Casablanca-Essaouira": { time: "3.5h", distance: "170 km" },
+                                            "Essaouira-Agadir": { time: "2.5h", distance: "130 km" },
+                                            "Marrakech-Essaouira": { time: "3h", distance: "170 km" },
+                                        };
+
+                                        let totalTimeHours = 0;
+                                        let totalDistanceKm = 0;
+
+                                        for (let i = 0; i < citiesInOrder.length - 1; i++) {
+                                            const key = `${citiesInOrder[i]}-${citiesInOrder[i+1]}`;
+                                            const revKey = `${citiesInOrder[i+1]}-${citiesInOrder[i]}`;
+                                            const estimate = travelEstimates[key] || travelEstimates[revKey];
+                                            if (estimate) {
+                                                const hours = parseFloat(estimate.time);
+                                                if (!isNaN(hours)) totalTimeHours += hours;
+                                                const km = parseInt(estimate.distance);
+                                                if (!isNaN(km)) totalDistanceKm += km;
+                                            } else {
+                                                totalTimeHours += 3;
+                                                totalDistanceKm += 150;
+                                            }
+                                        }
+
+                                        const summaryHours = Math.round(totalTimeHours);
+                                        const summaryDistance = Math.round(totalDistanceKm / 50) * 50;
+
+                                        let html = `
+                                            <div class="bg-white border border-[#E8D5B7] rounded-3xl p-4 mb-6">
+                                                <div class="font-medium text-[#C45C26] mb-1">Route Overview</div>
+                                                <div class="text-sm text-[#0A1628]/90">
+                                                    ${citiesInOrder.length} cities • ~${summaryDistance} km driving • ~${summaryHours} hours on the road
+                                                </div>
+                                            </div>
+                                        `;
+
+                                        const activityData = {
+                                            "Casablanca": ["Visit the iconic Hassan II Mosque", "Stroll the Corniche waterfront", "Explore the historic Medina", "Shop at the Central Market"],
+                                            "Rabat": ["Walk the Kasbah of the Udayas", "Visit the Mausoleum of Mohammed V", "See the Royal Palace", "Relax in the Andalusian Gardens"],
+                                            "Fez": ["Wander the ancient Medina and souks", "Visit the famous tanneries", "Explore Al Quaraouiyine University", "Tour the Bou Inania Madrasa"],
+                                            "Meknes": ["Visit the impressive Bab Mansour gate", "Explore the Medina", "Day trip to Roman ruins of Volubilis"],
+                                            "Marrakech": ["Experience Jemaa el-Fna square at sunset", "Visit the beautiful Majorelle Garden", "Shop in the vibrant souks", "Tour the historic Bahia Palace"],
+                                            "Ouarzazate": ["Tour the famous Atlas Film Studios", "Visit the stunning Ait Benhaddou Kasbah", "Explore the local kasbahs"],
+                                            "Merzouga": ["Camel trek into the Erg Chebbi dunes at sunset", "Sandboarding on the dunes", "Stargazing at your desert camp", "Visit a local Berber family"],
+                                            "Errachidia": ["Visit the Ziz Valley", "Explore local markets", "Scenic drive through the palm groves"],
+                                            "Bouarfa": ["Discover the eastern desert landscapes", "Local markets and crafts"],
+                                            "Beni Mellal": ["Visit the Kasbah of Beni Mellal", "Explore the local souks", "Day trip to Bin El Ouidane lake and dam"],
+                                            "Imilchil": ["Visit the famous Lakes Tislit and Isli", "Hike in the High Atlas Mountains", "Experience traditional Berber culture"],
+                                            "Khenifra": ["Explore the Middle Atlas cedar forests", "Visit local waterfalls and valleys"],
+                                            "Ifrane": ["Stroll the European-style town", "Hike in the surrounding cedar forests", "Visit the famous lion statue"],
+                                            "Ouezzane": ["Visit the historic medina and zaouia", "Explore the surrounding countryside"],
+                                            "Chefchaouen": ["Wander the famous blue streets of the Medina", "Hike to the Spanish Mosque viewpoint", "Visit Ras El Maa waterfall", "Shop for local handicrafts"],
+                                            "Tetouan": ["Explore the UNESCO-listed Medina", "Visit the Royal Palace and museums", "Relax on the nearby beaches"],
+                                            "Tangiers": ["Stroll the Kasbah and medina", "Visit the Hercules Caves", "Enjoy the views from the Cape Spartel lighthouse"],
+                                            "Essaouira": ["Walk the historic ramparts and medina", "Visit the fishing port and eat fresh seafood", "Relax on the windy Atlantic beach", "Shop for argan oil and thuya wood crafts"],
+                                            "Agadir": ["Relax on the long sandy beach", "Visit the Souk El Had market", "Explore the Agadir Kasbah ruins", "Day trip to Paradise Valley"],
+                                            "Ceuta (Spain)": ["Visit the Royal Walls", "Explore the Monte Hacho viewpoint", "Enjoy duty-free shopping"]
+                                        };
+
+                                        const getTransportTo = (from, to) => {
+                                            const common = "Private driver (most flexible) or CTM bus.";
+                                            if (["Casablanca", "Rabat", "Fez", "Marrakech", "Meknes"].includes(from) && ["Casablanca", "Rabat", "Fez", "Marrakech", "Meknes"].includes(to)) {
+                                                return "ONCF train (recommended - comfortable & scenic) or private driver.";
+                                            }
+                                            if (to.includes("Merzouga") || to.includes("Ouarzazate") || from.includes("Merzouga")) {
+                                                return "Private 4x4 with driver (strongly recommended for the desert roads).";
+                                            }
+                                            if (["Chefchaouen", "Tetouan", "Tangiers"].includes(to) || ["Chefchaouen", "Tetouan", "Tangiers"].includes(from)) {
+                                                return "Private driver or CTM bus through the Rif Mountains.";
+                                            }
+                                            if (["Essaouira", "Agadir"].includes(to) || ["Essaouira", "Agadir"].includes(from)) {
+                                                return "Supratours bus or private driver (scenic coastal route).";
+                                            }
+                                            return common;
+                                        };
+
+                                        // Render clean city sequence with activities + transport
+                                        citiesInOrder.forEach((city, index) => {
+                                            const activities = activityData[city] || ["Explore the local Medina and souks", "Visit historic sites and landmarks"];
+                                            const nextCity = index < citiesInOrder.length - 1 ? citiesInOrder[index + 1] : null;
+
+                                            let cardHTML = `
+                                                <div class="itinerary-day bg-white border border-[#E8D5B7] rounded-3xl p-5 mb-4">
+                                                    <div class="flex items-center gap-x-3 mb-3">
+                                                        <div class="w-8 h-8 bg-[#C45C26] text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0">
+                                                            ${index + 1}
+                                                        </div>
+                                                        <div class="font-semibold text-xl">${city}</div>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <div class="text-xs uppercase tracking-widest text-[#C45C26] font-medium mb-1">Popular Activities</div>
+                                                        <ul class="text-sm space-y-0.5 text-[#0A1628]/90">
+                                                            ${activities.map(act => `<li>• ${act}</li>`).join('')}
+                                                        </ul>
+                                                    </div>
+                                            `;
+
+                                            if (nextCity) {
+                                                const key = `${city}-${nextCity}`;
+                                                const revKey = `${nextCity}-${city}`;
+                                                const estimate = travelEstimates[key] || travelEstimates[revKey];
+                                                const time = estimate ? estimate.time : "3–4h";
+                                                const distance = estimate ? estimate.distance : "~150 km";
+                                                const transport = getTransportTo(city, nextCity);
+
+                                                cardHTML += `
+                                                    <div class="pt-3 border-t border-[#E8D5B7]">
+                                                        <div class="text-xs uppercase tracking-widest text-[#C45C26] font-medium mb-1">To ${nextCity}</div>
+                                                        <div class="text-sm text-[#0A1628]/85">
+                                                            ${time} • ${distance}<br>
+                                                            ${transport}
+                                                        </div>
+                                                    </div>
+                                                `;
+                                            }
+
+                                            cardHTML += `</div>`;
+                                            daysContainer.innerHTML += cardHTML;
+                                        });
+                                    } else {
+                                        daysContainer.innerHTML = '';
+                                    }
+                                }
+
+                                // Populate sidebar directly from our self-contained data (never blank)
+                                try {
+                                    let trans = data.transportation || [];
+                                    let tps = data.tips || [];
+
+                                    // Safety fallback – ensure something always shows
+                                    if (trans.length === 0) {
+                                        trans = [
+                                            { icon: "fa-plane", title: "International Flights", desc: "Fly into Marrakech (RAK) or Casablanca (CMN) depending on your origin." },
+                                            { icon: "fa-taxi", title: "Local Movement", desc: "Petits taxis, walking in medinas, and private drivers for day trips." }
+                                        ];
+                                    }
+                                    if (tps.length === 0) {
+                                        tps = [
+                                            "Dress modestly in medinas and religious sites (shoulders and knees covered).",
+                                            "Use cash (MAD). ATMs are good in cities but limited in rural areas.",
+                                            "Bargain politely in souks — start at roughly half the asking price.",
+                                            "Drink only bottled or filtered water."
+                                        ];
+                                    }
+
+                                    if (typeof renderTransportation === 'function') {
+                                        renderTransportation(trans);
+                                    }
+                                    if (typeof renderDetailedTransport === 'function' && data.detailedTransport && data.detailedTransport.length > 0) {
+                                        renderDetailedTransport(data.detailedTransport, window.selectedOrigin);
+                                    }
+                                    if (typeof renderTravelTips === 'function') {
+                                        renderTravelTips(tps);
+                                    }
+                                    // Quick Facts section removed per request
+                                    window.currentItinerary = data;
+                                } catch (sideErr) {
+                                    console.warn('Sidebar rendering issue (non-critical):', sideErr);
+                                }
+
+                                // ===================================================================
+                                // === PRESERVE THIS MAP CODE - DO NOT MOVE, DELETE, OR REFACTOR ===
+                                // === THE SELF-CONTAINED JOURNEY MAP (working since 2026)       ===
+                                // ===================================================================
+                                // This entire map routine is deliberately isolated inside this IIFE.
+                                // It is the single source of truth for the interactive Leaflet map.
+                                // It must never depend on anything outside this closure.
+                                // If you need to change map behavior, edit ONLY inside this block.
+                                // Previous global map attempts repeatedly corrupted the feature.
+                                // ===================================================================
+                                if (data.locations && data.locations.length > 0) {
+                                    setTimeout(() => {
+                                        // === LOCAL PROTECTED MAP INITIALIZER (do not extract or rename) ===
+                                        function __babSahara_initJourneyMap(locationsForMap) {
+                                            const mapContainer = document.getElementById('map');
+                                            const statusEl = document.getElementById('map-status');
+                                            const directionsPanel = document.getElementById('directions-panel');
+                                            const directionsList = document.getElementById('directions-list');
+                                            const directionsSummary = document.getElementById('directions-summary');
+
+                                            if (!mapContainer) return;
+
+                                            // Ensure visible container (prevents "entire area is empty")
+                                            mapContainer.style.background = '#f8f1e3';
+                                            mapContainer.style.minHeight = '480px';
+
+                                            // Clear previous content / errors
+                                            mapContainer.innerHTML = '';
+
+                                            if (typeof window.L === 'undefined' || !window.L) {
+                                                mapContainer.innerHTML = `
+                                                    <div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f8f1e3;color:#c53030;font-size:15px;text-align:center;padding:24px;">
+                                                        Leaflet map library failed to load.<br>Check your internet connection and refresh.
+                                                    </div>`;
+                                                if (statusEl) {
+                                                    statusEl.style.display = 'block';
+                                                    statusEl.style.background = '#fee2e2';
+                                                    statusEl.style.color = '#b91c1c';
+                                                    statusEl.innerHTML = 'Map library unavailable';
+                                                }
+                                                return;
+                                            }
+
+                                            let map;
+                                            try {
+                                                map = L.map(mapContainer, {
+                                                    zoomControl: true,
+                                                    attributionControl: false
+                                                }).setView([31.2, -7.0], 5.8);
+
+                                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                                    className: 'map-tiles'
+                                                }).addTo(map);
+
+                                                // Add all markers immediately (visual feedback first)
+                                                const bounds = [];
+                                                locationsForMap.forEach((loc, idx) => {
+                                                    const marker = L.marker([loc.lat, loc.lng]).addTo(map);
+                                                    marker.bindPopup(`<strong>${loc.name}</strong><br><span style="font-size:0.85em;color:#666">Stop ${idx+1}</span>`);
+                                                    bounds.push([loc.lat, loc.lng]);
+                                                });
+
+                                                if (bounds.length > 0) {
+                                                    map.fitBounds(bounds, { padding: [50, 50], maxZoom: 7 });
+                                                }
+
+                                                // Status helper (local to this protected function)
+                                                function setMapStatus(realRoute, msg) {
+                                                    if (!statusEl) return;
+                                                    statusEl.style.display = 'block';
+                                                    if (realRoute) {
+                                                        statusEl.style.background = '#e6f4ea';
+                                                        statusEl.style.color = '#1e7e34';
+                                                        statusEl.innerHTML = `🟢 ${msg || 'Accurate road routes (OSRM)'}`;
+                                                    } else {
+                                                        statusEl.style.background = '#fff3cd';
+                                                        statusEl.style.color = '#856404';
+                                                        statusEl.innerHTML = `🟡 ${msg || 'Showing straight-line preview'}`;
+                                                    }
+                                                }
+
+                                                // Draw real-road route via public OSRM (100% free, no key)
+                                                async function drawAccurateRoute() {
+                                                    if (!map || locationsForMap.length < 2) {
+                                                        setMapStatus(false, 'Single destination – no route needed');
+                                                        return;
+                                                    }
+
+                                                    const OSRM = 'https://router.project-osrm.org';
+                                                    const coordStr = locationsForMap.map(l => `${l.lng},${l.lat}`).join(';');
+                                                    const url = `${OSRM}/route/v1/driving/${coordStr}?overview=full&geometries=geojson&steps=true`;
+
+                                                    try {
+                                                        const resp = await fetch(url, { method: 'GET' });
+                                                        if (!resp.ok) throw new Error('OSRM ' + resp.status);
+
+                                                        const json = await resp.json();
+                                                        const route = json.routes && json.routes[0];
+                                                        if (!route || !route.geometry) throw new Error('No geometry');
+
+                                                        const coords = route.geometry.coordinates; // [lng, lat] pairs
+                                                        const latLngs = coords.map(c => [c[1], c[0]]); // Leaflet wants [lat, lng]
+
+                                                        // Draw beautiful real-road polyline
+                                                        const poly = L.polyline(latLngs, {
+                                                            color: '#C45C26',
+                                                            weight: 5,
+                                                            opacity: 0.85,
+                                                            lineJoin: 'round',
+                                                            lineCap: 'round'
+                                                        }).addTo(map);
+
+                                                        // Fit again to the actual road route
+                                                        map.fitBounds(poly.getBounds(), { padding: [60, 60], maxZoom: 7.5 });
+
+                                                        // Populate turn-by-turn if available
+                                                        const legs = route.legs && route.legs[0];
+                                                        if (legs && legs.steps && legs.steps.length > 1 && directionsList && directionsSummary) {
+                                                            directionsPanel.style.display = 'block';
+                                                            directionsSummary.textContent = `${(route.duration / 60).toFixed(0)} min • ${(route.distance / 1000).toFixed(0)} km`;
+
+                                                            directionsList.innerHTML = '';
+                                                            legs.steps.forEach((step, i) => {
+                                                                const d = document.createElement('div');
+                                                                d.style.cssText = 'padding:5px 0;border-bottom:1px solid #eee;font-size:0.92em';
+                                                                const name = step.name ? ` onto ${step.name}` : '';
+                                                                const dist = step.distance ? ` — ${(step.distance/1000).toFixed(1)} km` : '';
+                                                                d.innerHTML = `<strong>${i+1}.</strong> ${step.maneuver?.type || 'continue'}${name}${dist}`;
+                                                                directionsList.appendChild(d);
+                                                            });
+                                                        }
+
+                                                        setMapStatus(true, 'Real roads via OSRM (free public service)');
+                                                    } catch (fetchErr) {
+                                                        // Fallback: straight dashed line so the area is NEVER empty
+                                                        const straight = locationsForMap.map(l => [l.lat, l.lng]);
+                                                        L.polyline(straight, {
+                                                            color: '#C45C26',
+                                                            weight: 4,
+                                                            opacity: 0.6,
+                                                            dashArray: '8, 6'
+                                                        }).addTo(map);
+
+                                                        setMapStatus(false, 'Real-road data unavailable (file:// or offline). Dashed preview shown.');
+                                                    }
+
+                                                    // Critical: fix Leaflet "hidden container" sizing bug
+                                                    setTimeout(() => { if (map) map.invalidateSize(); }, 180);
+                                                    setTimeout(() => { if (map) map.invalidateSize(); }, 520);
+                                                    setTimeout(() => { if (map) map.invalidateSize(); }, 1050);
+                                                    setTimeout(() => { if (map) map.invalidateSize(); }, 1650);
+                                                }
+
+                                                // Kick off routing (async)
+                                                drawAccurateRoute();
+
+                                                // Immediate extra safety invalidates (map may have been hidden)
+                                                setTimeout(() => { if (map) map.invalidateSize(); }, 320);
+                                                setTimeout(() => { if (map) map.invalidateSize(); }, 780);
+
+                                            } catch (initErr) {
+                                                console.error('Map init error (self-contained):', initErr);
+                                                mapContainer.innerHTML = `
+                                                    <div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f8f1e3;color:#c53030;font-size:15px;text-align:center;padding:24px;">
+                                                        Map could not initialize.<br>${initErr.message || 'Unknown error'}
+                                                    </div>`;
+                                                if (statusEl) {
+                                                    statusEl.style.display = 'block';
+                                                    statusEl.style.background = '#fee2e2';
+                                                    statusEl.style.color = '#b91c1c';
+                                                    statusEl.innerHTML = 'Map initialization failed';
+                                                }
+                                            }
+                                        }
+                                        // === END OF PROTECTED MAP INITIALIZER ===
+
+                                        // Call the protected initializer (this is the only call site)
+                                        __babSahara_initJourneyMap(data.locations);
+
+                                        // =====================================================
+                                        // NEW: Practical Tools (Weather, Prayer Times, Currency)
+                                        // All client-side, free APIs, no keys required
+                                        // =====================================================
+
+                                        // 1. Currency Converter (MAD live rates)
+                                        (function initCurrencyConverter() {
+                                            const input = document.getElementById('currency-input');
+                                            const select = document.getElementById('currency-select');
+                                            const output = document.getElementById('currency-output');
+                                            if (!input || !select || !output) return;
+
+                                            let rates = { USD: 0.10, EUR: 0.092, GBP: 0.078, CAD: 0.137 }; // sensible fallbacks
+
+                                            async function loadRates() {
+                                                try {
+                                                    const res = await fetch('https://open.er-api.com/v6/latest/MAD');
+                                                    if (res.ok) {
+                                                        const json = await res.json();
+                                                        if (json && json.rates) {
+                                                            rates = {
+                                                                USD: json.rates.USD || rates.USD,
+                                                                EUR: json.rates.EUR || rates.EUR,
+                                                                GBP: json.rates.GBP || rates.GBP,
+                                                                CAD: json.rates.CAD || rates.CAD
+                                                            };
+                                                        }
+                                                    }
+                                                } catch (e) {
+                                                    // keep fallbacks
+                                                }
+                                            }
+
+                                            function updateConversion() {
+                                                const amount = parseFloat(input.value) || 0;
+                                                const target = select.value;
+                                                const rate = rates[target] || 0.1;
+                                                const converted = (amount * rate).toFixed(2);
+                                                output.textContent = converted + ' ' + target;
+                                            }
+
+                                            input.addEventListener('input', updateConversion);
+                                            select.addEventListener('change', updateConversion);
+
+                                            // Initial load
+                                            loadRates().then(updateConversion);
+                                            // Update once more after rates load
+                                            setTimeout(updateConversion, 1200);
+                                        })();
+
+                                        // 2. Weather (Open-Meteo) + 3. Prayer Times (Aladhan)
+                                        (async function loadPracticalInfo() {
+                                            const weatherContainer = document.getElementById('weather-forecast');
+                                            const prayerContainer = document.getElementById('prayer-times');
+                                            if (!weatherContainer || !prayerContainer) return;
+
+                                            const cities = (data.locations || []).map(l => l.name);
+                                            if (cities.length === 0) return;
+
+                                            // === WEATHER ===
+                                            weatherContainer.innerHTML = '<div class="text-[#0A1628]/60 text-xs col-span-2">Loading weather...</div>';
+
+                                            const weatherPromises = cities.slice(0, 5).map(async (cityName) => {
+                                                const loc = data.locations.find(l => l.name === cityName);
+                                                if (!loc) return null;
+
+                                                try {
+                                                    const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lng}&current=temperature_2m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Africa/Casablanca&forecast_days=4`;
+                                                    const res = await fetch(url);
+                                                    const json = await res.json();
+
+                                                    const current = json.current || {};
+                                                    const daily = json.daily || {};
+
+                                                    // Simple weather code to emoji
+                                                    const code = current.weathercode ?? daily.weathercode?.[0] ?? 0;
+                                                    let icon = '☀️';
+                                                    if (code >= 45 && code <= 48) icon = '🌫️';
+                                                    else if (code >= 51 && code <= 67) icon = '🌦️';
+                                                    else if (code >= 71 && code <= 77) icon = '❄️';
+                                                    else if (code >= 80 && code <= 82) icon = '🌧️';
+                                                    else if (code >= 85 && code <= 86) icon = '🌨️';
+                                                    else if (code >= 95) icon = '⛈️';
+
+                                                    const max = daily.temperature_2m_max?.[0];
+                                                    const min = daily.temperature_2m_min?.[0];
+
+                                                    return {
+                                                        name: cityName,
+                                                        icon,
+                                                        current: Math.round(current.temperature_2m ?? 0),
+                                                        high: max ? Math.round(max) : null,
+                                                        low: min ? Math.round(min) : null
+                                                    };
+                                                } catch (err) {
+                                                    return { name: cityName, icon: '🌍', current: '—', error: true };
+                                                }
+                                            });
+
+                                            const weatherResults = await Promise.all(weatherPromises);
+
+                                            let weatherHTML = '';
+                                            weatherResults.forEach(w => {
+                                                if (!w) return;
+                                                weatherHTML += `
+                                                    <div class="flex items-center justify-between bg-[#F8F1E3] rounded-2xl px-4 py-3">
+                                                        <div>
+                                                            <div class="font-medium">${w.name}</div>
+                                                            <div class="text-xs text-[#0A1628]/60">${w.high !== null ? `${w.high}° / ${w.low}°` : ''}</div>
+                                                        </div>
+                                                        <div class="text-right">
+                                                            <div class="text-2xl">${w.icon}</div>
+                                                            <div class="text-sm font-semibold">${w.current}${typeof w.current === 'number' ? '°C' : ''}</div>
+                                                        </div>
+                                                    </div>
+                                                `;
+                                            });
+                                            weatherContainer.innerHTML = weatherHTML || '<div class="text-xs text-[#0A1628]/60">Weather data unavailable</div>';
+
+                                            // === PRAYER TIMES (Aladhan) - for the first main city ===
+                                            prayerContainer.innerHTML = '<div class="text-[#0A1628]/60 text-xs">Loading prayer times...</div>';
+
+                                            const mainCity = cities[0]; // first stop is usually the most relevant
+                                            const mainLoc = data.locations[0];
+
+                                            try {
+                                                const prayerUrl = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(mainCity)}&country=Morocco&method=3`;
+                                                const pRes = await fetch(prayerUrl);
+                                                const pJson = await pRes.json();
+
+                                                if (pJson.code === 200 && pJson.data && pJson.data.timings) {
+                                                    const t = pJson.data.timings;
+                                                    prayerContainer.innerHTML = `
+                                                        <div class="text-sm">
+                                                            <div class="font-medium mb-1">${mainCity}</div>
+                                                            <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                                                                <div>Fajr <span class="font-mono text-[#C45C26]">${t.Fajr}</span></div>
+                                                                <div>Dhuhr <span class="font-mono text-[#C45C26]">${t.Dhuhr}</span></div>
+                                                                <div>Asr <span class="font-mono text-[#C45C26]">${t.Asr}</span></div>
+                                                                <div>Maghrib <span class="font-mono text-[#C45C26]">${t.Maghrib}</span></div>
+                                                                <div>Isha <span class="font-mono text-[#C45C26]">${t.Isha}</span></div>
+                                                            </div>
+                                                        </div>
+                                                    `;
+                                                } else {
+                                                    prayerContainer.innerHTML = `<div class="text-xs text-[#0A1628]/60">Prayer times unavailable for ${mainCity}</div>`;
+                                                }
+                                            } catch (e) {
+                                                prayerContainer.innerHTML = `<div class="text-xs text-[#0A1628]/60">Could not load prayer times</div>`;
+                                            }
+                                        })();
+                                    }, 320);
+                                }
+
+                            } catch(e) {
+                                console.error('Generate error:', e);
+                                alert('There was a problem generating the itinerary. Please try refreshing the page.');
+                            }
+                        };
+
+                        const origUpdate = window.updateGenerateButton;
+                        window.updateGenerateButton = function() {
+                            if (origUpdate) origUpdate();
+                            const btn = document.getElementById('generate-btn');
+                            if (btn && window.selectedOrigin && window.selectedDuration && window.selectedInterest) {
+                                btn.disabled = false;
+                            }
+                        };
+                    })();
+                </script>
+            </div>
+        </div>
+    </section>
+
+    <!-- Itinerary Results -->
+    <section id="results" class="hidden max-w-screen-2xl mx-auto px-8 py-16 bg-[#F8F1E3]">
+        <div class="max-w-6xl mx-auto">
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-y-4 mb-9">
+                <div>
+                    <div class="uppercase tracking-widest text-xs font-semibold text-[#C45C26]">YOUR PERSONALIZED JOURNEY</div>
+                    <h2 id="results-title" class="section-header text-5xl tracking-tighter mt-1"></h2>
+                    <p id="results-subtitle" class="text-[#0A1628]/70 mt-1"></p>
+                </div>
+                
+                <div class="flex items-center gap-x-3">
+                    <!-- Currency Converter Widget -->
+                    <div class="hidden md:flex items-center bg-white border border-[#E8D5B7] rounded-full px-3 py-1 text-sm shadow-sm">
+                        <div class="flex items-center gap-x-2">
+                            <span class="text-[#C45C26] font-medium">MAD</span>
+                            <input id="currency-input" type="number" value="500" class="w-16 bg-transparent border-0 text-right font-medium focus:outline-none" placeholder="500">
+                            <span class="text-[#0A1628]/60">→</span>
+                            <select id="currency-select" class="bg-transparent border-0 text-sm font-medium focus:outline-none cursor-pointer">
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                                <option value="GBP">GBP</option>
+                                <option value="CAD">CAD</option>
+                            </select>
+                            <span id="currency-output" class="font-semibold text-[#0A1628] min-w-[52px] text-right">—</span>
+                        </div>
+                    </div>
+
+                    <button onclick="printItinerary()" 
+                            class="px-5 py-2.5 flex items-center gap-x-2 text-sm rounded-full border border-[#C45C26]/30 hover:bg-white transition-colors">
+                        <i class="fa-solid fa-print"></i>
+                        <span>Print / PDF</span>
+                    </button>
+                    <button onclick="startNewTrip()" 
+                            class="px-5 py-2.5 flex items-center gap-x-2 text-sm rounded-full bg-[#C45C26] text-white hover:bg-[#A84D20] transition-colors">
+                        <i class="fa-solid fa-redo"></i>
+                        <span>New Trip</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-12 gap-7">
+                
+                <!-- Your Journey (full width now) -->
+                <div class="lg:col-span-12">
+                    <div class="flex items-center gap-x-3 mb-5 px-1">
+                        <i class="fa-solid fa-route text-[#C45C26]"></i>
+                        <h3 class="font-semibold text-xl tracking-tight">Your Journey</h3>
+                    </div>
+                    
+                    <div id="itinerary-days" class="space-y-3"></div>
+                </div>
+
+                <!-- Practical Tools: Weather + Prayer Times -->
+                <div class="lg:col-span-12 mt-6">
+                    <div class="flex items-center gap-x-3 mb-4 px-1">
+                        <i class="fa-solid fa-info-circle text-[#C45C26]"></i>
+                        <h3 class="font-semibold text-xl tracking-tight">Practical Info for Your Trip</h3>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        
+                        <!-- Weather Forecast -->
+                        <div class="bg-white border border-[#E8D5B7] rounded-3xl p-6">
+                            <div class="flex items-center gap-x-2 mb-4">
+                                <i class="fa-solid fa-cloud-sun text-[#C45C26]"></i>
+                                <h4 class="font-semibold">Weather Forecast</h4>
+                                <span class="text-[10px] text-[#0A1628]/50 ml-auto">Open-Meteo • free</span>
+                            </div>
+                            <div id="weather-forecast" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                                <!-- Populated dynamically by JS -->
+                                <div class="text-[#0A1628]/60 text-xs">Loading weather for your stops...</div>
+                            </div>
+                        </div>
+
+                        <!-- Prayer Times -->
+                        <div class="bg-white border border-[#E8D5B7] rounded-3xl p-6">
+                            <div class="flex items-center gap-x-2 mb-4">
+                                <i class="fa-solid fa-mosque text-[#C45C26]"></i>
+                                <h4 class="font-semibold">Prayer Times (today)</h4>
+                                <span class="text-[10px] text-[#0A1628]/50 ml-auto">Aladhan • free</span>
+                            </div>
+                            <div id="prayer-times" class="text-sm">
+                                <!-- Populated dynamically by JS -->
+                                <div class="text-[#0A1628]/60 text-xs">Loading prayer times...</div>
+                            </div>
+                            <div class="mt-3 text-[10px] text-[#0A1628]/50">
+                                Times shown for the main city of your route. Use for planning.
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                
+                <!-- Interactive Map -->
+                <div class="lg:col-span-12 mt-4">
+                    <div class="flex items-center justify-between mb-4 px-1">
+                        <div class="flex items-center gap-x-3">
+                            <i class="fa-solid fa-map-marked text-[#C45C26]"></i>
+                            <h3 class="font-semibold text-xl tracking-tight">Your Journey Map</h3>
+                        </div>
+                        <div class="text-xs text-[#0A1628]/60">Click markers for details • Drag to explore</div>
+                    </div>
+                    
+                    <div class="map-container border border-[#E8D5B7] shadow-xl" style="height: 480px; background: #f8f1e3;">
+                        <div id="map" class="w-full h-full"></div>
+                    </div>
+                    <div class="text-center text-[10px] text-[#0A1628]/50 mt-2">Map data © OpenStreetMap contributors</div>
+
+                    <!-- Map Status Indicator (now includes driving time when available) -->
+                    <div id="map-status" 
+                         style="margin: 8px 0; padding: 6px 12px; font-size: 0.85em; border-radius: 6px; display: none; text-align: center;">
+                    </div>
+
+                    <!-- Collapsible Directions Panel (starts collapsed) -->
+                    <div id="directions-panel" 
+                         style="border: 1px solid #ddd; border-radius: 8px; margin-top: 8px; background: #fff; overflow: hidden; display: none;">
+                        
+                        <div id="directions-header" 
+                             style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; cursor: pointer; background: #f9f5f0;"
+                             onclick="var l=document.getElementById('directions-list'); var b=document.getElementById('directions-toggle-btn'); var vis=(l.style.display!=='none'); l.style.display=vis?'none':'block'; b.textContent=vis?'Show':'Hide';">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <strong style="color: #C45C26; font-size: 0.95em;">Directions</strong>
+                                <span id="directions-summary" 
+                                      style="font-size: 0.85em; color: #555; font-weight: 500;"></span>
+                            </div>
+                            <button id="directions-toggle-btn"
+                                    style="background: #C45C26; color: white; border: none; padding: 3px 9px; border-radius: 4px; font-size: 0.75em; cursor: pointer;"
+                                    onclick="event.stopImmediatePropagation(); var l=document.getElementById('directions-list'); var vis=(l.style.display!=='none'); l.style.display=vis?'none':'block'; this.textContent=vis?'Show':'Hide';">
+                                Show
+                            </button>
+                        </div>
+
+                        <div id="directions-list" 
+                             style="max-height: 280px; overflow-y: auto; padding: 8px 12px; display: none; font-size: 0.85em;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust / Footer -->
+    <footer class="bg-[#0A1628] text-white/70 pt-12 pb-9">
+        <div class="max-w-screen-2xl mx-auto px-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-y-8 text-sm">
+                <div>
+                    <div class="flex items-center gap-x-3 mb-3">
+                        <div class="w-8 h-8 bg-[#C45C26] rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-archway text-white"></i>
+                        </div>
+                        <span class="text-white text-xl font-semibold tracking-tighter">Bab Sahara</span>
+                    </div>
+                    <div class="text-xs">Handcrafted journeys since 2007. Based in Marrakech &amp; Fez.</div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-x-10 text-xs">
+                    <div>
+                        <div class="font-medium text-white mb-2 tracking-wider">EXPLORE</div>
+                        <div class="space-y-1.5">
+                            <div>The Imperial Cities</div>
+                            <div>Sahara Expeditions</div>
+                            <div>Atlas Treks</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="font-medium text-white mb-2 tracking-wider">RESOURCES</div>
+                        <div class="space-y-1.5">
+                            <div>Travel Guide 2026</div>
+                            <div>Visa &amp; Entry</div>
+                            <div>Packing Lists</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="font-medium text-white mb-2 tracking-wider">SUPPORT</div>
+                        <div class="space-y-1.5">
+                            <div>Contact our team</div>
+                            <div>Private guides</div>
+                            <div>Custom requests</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 pt-6 border-t border-white/10 text-[10px] flex flex-col md:flex-row justify-between gap-y-2">
+                <div>© Bab Sahara 2026. All rights reserved. Designed with love for Morocco.</div>
+                <div class="flex gap-x-4">
+                    <span class="hover:text-white cursor-pointer">Privacy</span>
+                    <span class="hover:text-white cursor-pointer">Terms</span>
+                    <span class="hover:text-white cursor-pointer">Responsible Travel</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // =====================================================================
+        // Bab Sahara - Main Global Script
+        // Most generation logic has been consolidated into the IIFE inside the
+        // planner section ("Self-contained reliable generator").
+        // Only shared render helpers, map code, and UI handlers remain here.
+        // =====================================================================
+
+        // Tailwind script
+        function initializeTailwind() {
+            document.documentElement.style.setProperty('--accent', '#C45C26');
+        }
+
+        // No external map services requiring keys are used.
+        // Map uses Leaflet + OpenStreetMap (completely free).
+
+        // State
+        let selectedDuration = null;
+        let selectedInterest = null;   // Now single selection only
+        let selectedOrigin = null;
+
+        const durationLabels = {
+            'short': '4-6 Days',
+            'medium': '7-9 Days',
+            'long': '10-12 Days',
+            'epic': '13+ Days'
+        };
+
+        const interestLabels = {
+            'heritage': 'Imperial Cities',
+            'desert': 'Sahara and Dunes',
+            'coast': 'Atlantic Coast',
+            'mountains': 'Atlas and Rif Mountains'
+        };
+
+        const originOptions = [
+            { 
+                id: 'usa', 
+                flag: '🇺🇸', 
+                label: 'United States', 
+                sub: 'Flying from the USA', 
+                bestAirport: 'CMN', 
+                airportName: 'Casablanca (CMN)', 
+                advice: 'Best connections from the USA. Royal Air Maroc and major US carriers fly direct to CMN.' 
+            },
+            { 
+                id: 'canada', 
+                flag: '🇨🇦', 
+                label: 'Canada', 
+                sub: 'Flying from Canada', 
+                bestAirport: 'CMN', 
+                airportName: 'Casablanca (CMN)', 
+                advice: 'Strong connections via CMN. Consider Montreal or Toronto departures.' 
+            },
+            { 
+                id: 'uk', 
+                flag: '🇬🇧', 
+                label: 'United Kingdom', 
+                sub: 'Flying from the UK', 
+                bestAirport: 'RAK or CMN', 
+                airportName: 'Marrakech (RAK) or Casablanca (CMN)', 
+                advice: 'Direct flights available to both Marrakech and Casablanca from London and other UK cities.' 
+            },
+            { 
+                id: 'france', 
+                flag: '🇫🇷', 
+                label: 'France', 
+                sub: 'Flying from France', 
+                bestAirport: 'RAK or CMN', 
+                airportName: 'Marrakech (RAK) or Casablanca (CMN)', 
+                advice: 'Excellent direct service from Paris, Lyon, Marseille and other French cities.' 
+            },
+            { 
+                id: 'europe', 
+                flag: '🇪🇺', 
+                label: 'Other Europe', 
+                sub: 'Flying from Europe', 
+                bestAirport: 'RAK, CMN or TNG', 
+                airportName: 'Marrakech, Casablanca or Tangier', 
+                advice: 'Many seasonal direct flights from Spain, Germany, Italy, Netherlands and more.' 
+            },
+            { 
+                id: 'world', 
+                flag: '🌍', 
+                label: 'Rest of the World', 
+                sub: 'Flying from elsewhere', 
+                bestAirport: 'CMN', 
+                airportName: 'Casablanca (CMN)', 
+                advice: 'Casablanca is Morocco\'s main international hub with the broadest global connections.' 
+            }
+        ];
+
+        // Render origin selection cards
+        function renderOriginOptions() {
+            const container = document.getElementById('origin-options');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            originOptions.forEach(option => {
+                const card = document.createElement('div');
+                card.className = `origin-card cursor-pointer border-2 border-white/20 hover:border-[#C5A46E] bg-[#1E2B44] hover:bg-[#253447] rounded-2xl p-5 text-center transition-all text-white shadow-lg`;
+                card.innerHTML = `
+                    <div class="text-4xl mb-3 drop-shadow-sm">${option.flag}</div>
+                    <div class="font-bold text-lg leading-tight mb-1 text-white">${option.label}</div>
+                    <div class="text-sm text-[#C5A46E] font-semibold mb-2 tracking-wide">${option.sub}</div>
+                    <div class="text-xs text-white/60">Recommended arrival: <span class="font-semibold text-[#C5A46E]">${option.bestAirport}</span></div>
+                `;
+                card.onclick = () => selectOrigin(option, card);
+                container.appendChild(card);
+            });
+        }
+
+        // Helper for static cards
+        function selectOriginById(id, element) {
+            const fullOption = originOptions.find(o => o.id === id);
+            if (fullOption) {
+                selectOrigin(fullOption, element);
+            }
+        }
+
+        function selectOrigin(option, element) {
+            // Deselect all cards
+            document.querySelectorAll('.origin-card').forEach(el => {
+                el.classList.remove('selected', 'border-[#C45C26]', 'bg-[#C45C26]', 'text-white', 'shadow-xl', 'scale-[1.02]');
+                el.classList.add('border-white/20', 'bg-[#1E2B44]');
+            });
+
+            // Select current with strong visual feedback
+            element.classList.add('selected', 'border-[#C45C26]', 'bg-[#C45C26]', 'text-white', 'shadow-xl', 'scale-[1.02]');
+            element.classList.remove('border-white/20', 'bg-[#1E2B44]');
+
+            selectedOrigin = option;
+
+            // Enable Duration step
+            const durationStep = document.getElementById('step-duration');
+            durationStep.classList.remove('opacity-40', 'pointer-events-none');
+
+            // Update indicators
+            document.getElementById('step-indicator-1').classList.remove('bg-white/10');
+            document.getElementById('step-indicator-1').classList.add('bg-[#C45C26]');
+            document.getElementById('step-indicator-2').classList.remove('bg-white/5', 'text-white/60');
+            document.getElementById('step-indicator-2').classList.add('bg-white/10');
+
+            updateGenerateButton();
+        }
+
+        // Duration selection
+        function selectDuration(duration, element) {
+            // Deselect all
+            document.querySelectorAll('.duration-btn').forEach(el => el.classList.remove('selected', 'border-[#C5A46E]', 'bg-[#C45C26]', 'text-white'));
+            document.querySelectorAll('.duration-btn').forEach(el => el.classList.add('border-white/20'));
+            
+            // Select current
+            element.classList.add('selected', 'border-[#C5A46E]', 'bg-[#C45C26]', 'text-white');
+            element.classList.remove('border-white/20');
+            
+            selectedDuration = duration;
+            
+            // Enable interests step
+            const interestsStep = document.getElementById('step-interests');
+            interestsStep.classList.remove('opacity-40', 'pointer-events-none');
+            
+            // Update indicators
+            document.getElementById('step-indicator-2').classList.remove('bg-white/5', 'text-white/60');
+            document.getElementById('step-indicator-2').classList.add('bg-[#C45C26]');
+            document.getElementById('step-indicator-3').classList.remove('bg-white/5', 'text-white/60');
+            document.getElementById('step-indicator-3').classList.add('bg-white/10');
+            
+            updateGenerateButton();
+        }
+
+        // Single interest selection (radio-style)
+        function selectInterest(interest, element) {
+            // Deselect all cards
+            document.querySelectorAll('#step-interests .interest-card').forEach(el => {
+                el.classList.remove('selected', 'border-[#C45C26]', 'bg-[#FEF6ED]');
+                el.classList.add('border-white/20');
+            });
+
+            // Select the clicked one
+            element.classList.add('selected', 'border-[#C45C26]', 'bg-[#FEF6ED]');
+            element.classList.remove('border-white/20');
+
+            selectedInterest = interest;
+            updateGenerateButton();
+        }
+
+        function updateGenerateButton() {
+            const btn = document.getElementById('generate-btn');
+            const hasOrigin = !!selectedOrigin;
+            const hasDuration = !!selectedDuration;
+            const hasInterest = !!selectedInterest;
+            
+            if (hasOrigin && hasDuration && hasInterest) {
+                btn.disabled = false;
+            } else {
+                btn.disabled = true;
+            }
+        }
+
+        // Generate the itinerary
+        // Delegator: uses the reliable self-contained generator from the button's IIFE
+        function generateItinerary() {
+            if (typeof window.generateItinerary === 'function') {
+                window.generateItinerary();
+            } else {
+                alert('Itinerary generator not ready yet. Please refresh the page.');
+            }
+        }
+
+        // NOTE: During safe cleanup (2026), most old global itinerary builders
+        // (buildCustomItinerary, createItineraryData, etc.) were removed.
+        // The IIFE above is the only active source of truth.
+
+        // (Old helpers createItineraryData, getDaysCount, determineLocations removed in safe cleanup)
+
+        // (All duplicate/broken global itinerary code fully excised.)
+                // === Sahara and Dunes ===
+                if (!usesCMN) {
+                    // Europe starts in Marrakech (Canada/USA already handled by general CMN arrival above)
+                    days.push({
+                        day: day++,
+                        title: "Arrival in Marrakech",
+                        location: "Marrakech",
+                        morning: "Arrive in Marrakech and transfer to your riad.",
+                        afternoon: "Explore the medina and Jemaa el-Fna.",
+                        evening: "Dinner and evening entertainment.",
+                        tags: ["Arrival", "Desert"]
+                    });
+                }
+
+                // Core route: Marrakech → Ouarzazate → Merzouga → Marrakech
+                days.push({
+                    day: day++,
+                    title: "Marrakech to Ouarzazate",
+                    location: "Ouarzazate",
+                    morning: "Scenic drive through the Atlas Mountains to Ouarzazate.",
+                    afternoon: "Visit the Kasbah of Taourirt and film studios.",
+                    evening: "Dinner in Ouarzazate.",
+                    tags: ["Desert", "Travel"]
+                });
+
+                days.push({
+                    day: day++,
+                    title: "Ouarzazate to Merzouga",
+                    location: "Merzouga",
+                    morning: "Drive to Merzouga via the Todra Gorge or Dades Valley.",
+                    afternoon: "Arrive at desert camp. Camel trek at sunset.",
+                    evening: "Traditional Berber dinner under the stars.",
+                    tags: ["Desert", "Adventure"]
+                });
+
+                days.push({
+                    day: day++,
+                    title: "Sahara Desert Experience",
+                    location: "Merzouga",
+                    morning: "Sunrise over the dunes. Optional sandboarding or quad bikes.",
+                    afternoon: "Relax at camp or visit a nomad family.",
+                    evening: "Another magical night in the desert.",
+                    tags: ["Desert", "Wellness"]
+                });
+
+                days.push({
+                    day: day++,
+                    title: "Return to Marrakech",
+                    location: "Marrakech",
+                    morning: "Early departure back to Marrakech.",
+                    afternoon: "Arrive and free time to relax.",
+                    evening: "Farewell dinner in Marrakech.",
+                    tags: ["Desert", "Travel"]
+                });
+
+                locations.push(
+                    { id: 'marrakech', name: 'Marrakech', lat: 31.6295, lng: -7.9811, type: 'city' },
+                    { id: 'ouarzazate', name: 'Ouarzazate', lat: 30.9335, lng: -6.9370, type: 'city' },
+                    { id: 'merzouga', name: 'Merzouga', lat: 31.1015, lng: -4.0116, type: 'desert' }
+                );
+
+            } else if (interest === 'coast') {
+                // === Atlantic Coast ===
+                if (usesCMN) {
+                    // Canada and USA: Always start in Casablanca, then follow Rabat → Essaouira → Agadir sequence
+                    // The prepend already added the initial "Arrival in Casablanca + transfer to Rabat"
+                    // Continue the sequence
+                    days.push({
+                        day: day++,
+                        title: "Rabat Exploration",
+                        location: "Rabat",
+                        morning: "Explore the Kasbah of the Udayas and historic sites.",
+                        afternoon: "Visit the Royal Palace area and medina.",
+                        evening: "Dinner in Rabat.",
+                        tags: ["Coast"]
+                    });
+
+                    days.push({
+                        day: day++,
+                        title: "Rabat to Essaouira",
+                        location: "Essaouira",
+                        morning: "Drive to the Atlantic coast.",
+                        afternoon: "Explore the UNESCO ramparts, fishing port, and medina.",
+                        evening: "Fresh seafood dinner.",
+                        tags: ["Coast"]
+                    });
+
+                    if (isMediumLong) {
+                        days.push({
+                            day: day++,
+                            title: "Essaouira to Agadir",
+                            location: "Agadir",
+                            morning: "Continue south along the coast.",
+                            afternoon: "Relax on the beach.",
+                            evening: "Dinner overlooking the ocean.",
+                            tags: ["Coast"]
+                        });
+                    }
+
+                    days.push({
+                        day: day++,
+                        title: "Return to Casablanca",
+                        location: "Casablanca",
+                        morning: "Travel back to Casablanca.",
+                        afternoon: "Free time before departure.",
+                        evening: "Departure from CMN.",
+                        tags: ["Departure"]
+                    });
+
+                    // Ensure locations include the stops
+                    if (!locations.find(l => l.id === 'rabat')) locations.push({ id: 'rabat', name: 'Rabat', lat: 34.0209, lng: -6.8416, type: 'city' });
+                    if (!locations.find(l => l.id === 'essaouira')) locations.push({ id: 'essaouira', name: 'Essaouira', lat: 31.5085, lng: -9.7595, type: 'coast' });
+                    if (isMediumLong && !locations.find(l => l.id === 'agadir')) {
+                        locations.push({ id: 'agadir', name: 'Agadir', lat: 30.4278, lng: -9.5981, type: 'coast' });
+                    }
+
+                } else {
+                    // Europe: can arrive Tangier, Rabat or Casablanca
+                    // For simplicity in code, we branch on origin id
+                    const europeArrival = (origin && (origin.id === 'uk' || origin.id === 'europe' || origin.id === 'other')) 
+                        ? (Math.random() > 0.5 ? 'tangier' : 'rabat') : 'casablanca'; // simulate choice
+
+                    if (origin && origin.id === 'tangier' || europeArrival === 'tangier') {
+                        // Tangier arrival route
+                        days.push({ day: day++, title: "Arrival Tangier", location: "Tangier", morning: "Arrive in Tangier.", afternoon: "Explore the city.", evening: "Dinner.", tags: ["Coast", "Arrival"] });
+                        days.push({ day: day++, title: "Tangier to Rabat", location: "Rabat", morning: "Travel to Rabat.", afternoon: "Explore Rabat.", evening: "Dinner.", tags: ["Coast"] });
+                        days.push({ day: day++, title: "Rabat to Casablanca", location: "Casablanca", morning: "Travel to Casablanca.", afternoon: "Explore Casablanca.", evening: "Dinner.", tags: ["Coast"] });
+                        if (isMediumLong) {
+                            days.push({ day: day++, title: "Casablanca to Agadir", location: "Agadir", morning: "Travel to Agadir.", afternoon: "Beach time.", evening: "Dinner.", tags: ["Coast"] });
+                        }
+                    } else if (origin && origin.id === 'rabat' || europeArrival === 'rabat') {
+                        days.push({ day: day++, title: "Arrival in Rabat", location: "Rabat", morning: "Arrive in Rabat.", afternoon: "Explore the city.", evening: "Dinner.", tags: ["Coast", "Arrival"] });
+                        days.push({ day: day++, title: "Rabat to Casablanca", location: "Casablanca", morning: "Travel to Casablanca.", afternoon: "Explore Casablanca.", evening: "Dinner.", tags: ["Coast"] });
+                        days.push({ day: day++, title: "Casablanca to Essaouira", location: "Essaouira", morning: "Travel to Essaouira.", afternoon: "Explore the medina and ramparts.", evening: "Seafood dinner.", tags: ["Coast"] });
+                        days.push({ day: day++, title: "Essaouira to Agadir", location: "Agadir", morning: "Travel to Agadir.", afternoon: "Beach time.", evening: "Dinner.", tags: ["Coast"] });
+                        days.push({ day: day++, title: "Return to Rabat", location: "Rabat", morning: "Return north to Rabat for departure.", afternoon: "Free time.", evening: "Departure.", tags: ["Departure"] });
+                    } else {
+                        // Default Casablanca arrival for Europe
+                        days.push({
+                            day: day++,
+                            title: "Arrival in Casablanca",
+                            location: "Casablanca",
+                            morning: "Arrive in Casablanca.",
+                            afternoon: "Explore the city and Hassan II Mosque.",
+                            evening: "Dinner in Casablanca.",
+                            tags: ["Coast", "Arrival"]
+                        });
+                        days.push({
+                            day: day++,
+                            title: "Casablanca to Rabat",
+                            location: "Rabat",
+                            morning: "Transfer to Rabat.",
+                            afternoon: "Visit the Kasbah of the Udayas.",
+                            evening: "Evening in Rabat.",
+                            tags: ["Coast"]
+                        });
+                        days.push({
+                            day: day++,
+                            title: "Rabat to Essaouira",
+                            location: "Essaouira",
+                            morning: "Drive to Essaouira.",
+                            afternoon: "Explore the beautiful coastal medina and ramparts.",
+                            evening: "Seafood dinner.",
+                            tags: ["Coast"]
+                        });
+                        if (isMediumLong) {
+                            days.push({
+                                day: day++,
+                                title: "Essaouira to Agadir",
+                                location: "Agadir",
+                                morning: "Continue to Agadir.",
+                                afternoon: "Beach time.",
+                                evening: "Dinner by the ocean.",
+                                tags: ["Coast"]
+                            });
+                        }
+                    }
+                }
+
+                locations.push(
+                    { id: 'tangier', name: 'Tangier', lat: 35.7595, lng: -5.8339, type: 'city' },
+                    { id: 'rabat', name: 'Rabat', lat: 34.0209, lng: -6.8416, type: 'city' },
+                    { id: 'casablanca', name: 'Casablanca', lat: 33.5731, lng: -7.5898, type: 'city' },
+                    { id: 'essaouira', name: 'Essaouira', lat: 31.5085, lng: -9.7595, type: 'coast' },
+                    { id: 'agadir', name: 'Agadir', lat: 30.4278, lng: -9.5981, type: 'coast' }
+                );
+            }
+
+            // All old conflicting itinerary code has been removed.
+            // The self-contained versions in the button script are authoritative.
+
+        function generateTransportation(locations, origin) {
+            const transport = [];
+            const usesCMN = origin && (origin.id === 'usa' || origin.id === 'canada');
+
+            if (usesCMN) {
+                // Hard requirement for USA and Canada travelers
+                const country = origin.id === 'usa' ? 'the USA' : 'Canada';
+                transport.push({
+                    icon: "fa-plane-arrival",
+                    title: "Arrival — Casablanca Mohammed V (CMN)",
+                    desc: `Always fly into Casablanca (CMN) when traveling from ${country}. It has the best long-haul connections. From CMN you will transfer to your first destination by train or private driver.`
+                });
+
+                transport.push({
+                    icon: "fa-plane-departure",
+                    title: "Departure — Casablanca Mohammed V (CMN)",
+                    desc: `Return to ${country} from Casablanca (CMN). It offers significantly more transatlantic flights and better timing than Marrakech (RAK). Budget time to reach the airport from your final city.`
+                });
+            } else {
+                const firstLoc = locations[0];
+                const firstCity = firstLoc ? firstLoc.name : 'Marrakech';
+                transport.push({
+                    icon: "fa-plane",
+                    title: "International Arrival",
+                    desc: `Fly into ${firstCity} (RAK) when possible, or Casablanca (CMN) for more long-haul options.`
+                });
+            }
+
+            // Internal connections
+            if (locations.find(l => l.id === 'fez')) {
+                transport.push({
+                    icon: "fa-train",
+                    title: "Marrakech → Fez",
+                    desc: "First-class train (4h30m) or private driver (5h)."
+                });
+            }
+            
+            if (locations.find(l => l.id === 'merzouga')) {
+                transport.push({
+                    icon: "fa-car",
+                    title: "To the Sahara",
+                    desc: "Private 4x4 or shared transfer. 8–10 hours from Marrakech or Fez."
+                });
+            }
+            
+            if (locations.find(l => l.id === 'essaouira')) {
+                transport.push({
+                    icon: "fa-car-side",
+                    title: "Coastal Route",
+                    desc: "Private driver or Supratours bus. 2.5–3.5 hours from Marrakech."
+                });
+            }
+            
+            if (locations.find(l => l.id === 'atlas')) {
+                transport.push({
+                    icon: "fa-hiking",
+                    title: "Atlas Mountains",
+                    desc: "Private driver + guide. 4x4 may be required for some areas."
+                });
+            }
+            
+            transport.push({
+                icon: "fa-taxi",
+                title: "Within Cities",
+                desc: "Petits taxis, walking in medinas, or private driver for the day."
+            });
+            
+            return transport;
+        }
+
+        // Detailed, practical ground transportation options (especially important for USA travelers arriving at CMN)
+        function generateDetailedTransportOptions(locations, origin) {
+            const usesCMN = origin && (origin.id === 'usa' || origin.id === 'canada');
+            const legs = [];
+
+            const firstLoc = locations[0];
+            const hasFez = locations.find(l => l.id === 'fez');
+            const hasMerzouga = locations.find(l => l.id === 'merzouga');
+            const hasEssaouira = locations.find(l => l.id === 'essaouira');
+            const hasAtlas = locations.find(l => l.id === 'atlas');
+
+            // === CMN Arrival Transfer (critical for USA and Canada travelers) ===
+            if (usesCMN && firstLoc) {
+                legs.push({
+                    from: "Casablanca Airport (CMN)",
+                    to: firstLoc.name,
+                    options: [
+                        {
+                            mode: "Train (Recommended)",
+                            duration: "3h 15m – 3h 45m",
+                            cost: "90–130 MAD (~$9–13 USD)",
+                            where: "CMN Airport has a direct train station. Buy tickets at the counter or use the ONCF app/website.",
+                            notes: "First-class is comfortable and reliable. Trains run frequently. Best value option."
+                        },
+                        {
+                            mode: "Private Driver / Transfer",
+                            duration: "3h – 3h 30m",
+                            cost: "1,200–1,800 MAD (~$120–180 USD) for 1–3 people",
+                            where: "Pre-book through your riad or companies like Morocco Private Transfers, or ask at the airport arrivals desk.",
+                            notes: "Door-to-door, more flexible with luggage and timing. Worth it for groups or late arrivals."
+                        },
+                        {
+                            mode: "Domestic Flight (CMN → RAK)",
+                            duration: "1h flight + 1h airport time",
+                            cost: "800–1,600 MAD (~$80–160 USD)",
+                            where: "Royal Air Maroc or Air Arabia counters inside the terminal after immigration.",
+                            notes: "Fastest if you're short on time. Not always cheaper than train + transfer."
+                        }
+                    ]
+                });
+            }
+
+            // Marrakech → Fez
+            if (hasFez) {
+                legs.push({
+                    from: "Marrakech",
+                    to: "Fez",
+                    options: [
+                        {
+                            mode: "First-Class Train",
+                            duration: "4h 30m – 5h",
+                            cost: "300–380 MAD (~$30–38 USD)",
+                            where: "Marrakech Train Station (Gare de Marrakech). Book via ONCF.ma or the app. Arrive 30 min early.",
+                            notes: "Very comfortable, scenic, and punctual. Highly recommended."
+                        },
+                        {
+                            mode: "Private Driver",
+                            duration: "4h 45m – 5h 30m",
+                            cost: "1,400–2,200 MAD (~$140–220 USD)",
+                            where: "Book through your riad or trusted companies (e.g. Sahara Magic, Morocco Unbound).",
+                            notes: "Best for families or if you want stops (e.g. Volubilis). Can be split among 2–4 people."
+                        },
+                        {
+                            mode: "CTM or Supratours Bus",
+                            duration: "6h – 7h",
+                            cost: "120–160 MAD (~$12–16 USD)",
+                            where: "CTM station near Jemaa el-Fna or Supratours next to the train station.",
+                            notes: "Cheapest option but longer and less comfortable for long distances."
+                        }
+                    ]
+                });
+            }
+
+            // To the Sahara (Merzouga)
+            if (hasMerzouga) {
+                legs.push({
+                    from: hasFez ? "Fez or Marrakech" : "Marrakech",
+                    to: "Merzouga (Sahara)",
+                    options: [
+                        {
+                            mode: "Private 4x4 with Driver",
+                            duration: "8h 30m – 10h (from Marrakech) / 9–11h (from Fez)",
+                            cost: "2,800–4,500 MAD (~$280–450 USD) one way for vehicle",
+                            where: "Must be pre-arranged through your desert camp or specialist tour company. Do not attempt self-drive.",
+                            notes: "Includes fuel, driver, and usually stops at Todra Gorge or Dades Valley. Strongly recommended."
+                        },
+                        {
+                            mode: "Shared 4x4 Transfer",
+                            duration: "9h – 11h",
+                            cost: "350–550 MAD (~$35–55 USD) per person",
+                            where: "Book via your riad or companies like Marrakech Desert Trips. Often departs early morning from specific hotels.",
+                            notes: "More affordable but less comfortable and fixed schedule. Good for solo/backpacker travelers."
+                        }
+                    ]
+                });
+            }
+
+            // Marrakech → Essaouira
+            if (hasEssaouira) {
+                legs.push({
+                    from: "Marrakech",
+                    to: "Essaouira",
+                    options: [
+                        {
+                            mode: "Private Driver",
+                            duration: "2h 45m – 3h 15m",
+                            cost: "900–1,400 MAD (~$90–140 USD)",
+                            where: "Book through your riad or companies such as Essaouira Transfers.",
+                            notes: "Most convenient. Can stop at Argan cooperatives along the way."
+                        },
+                        {
+                            mode: "Supratours Bus",
+                            duration: "3h – 3h 30m",
+                            cost: "70–90 MAD (~$7–9 USD)",
+                            where: "Supratours office next to Marrakech train station. Tickets available on the day.",
+                            notes: "Reliable and inexpensive. Buses are modern and air-conditioned."
+                        }
+                    ]
+                });
+            }
+
+            // Atlas Mountains
+            if (hasAtlas) {
+                legs.push({
+                    from: "Marrakech",
+                    to: "High Atlas (Imlil / Ouarzazate area)",
+                    options: [
+                        {
+                            mode: "Private Driver + Guide",
+                            duration: "1h 30m – 3h depending on destination",
+                            cost: "800–2,000 MAD (~$80–200 USD) depending on group size and duration",
+                            where: "Book via your riad or reputable Atlas trekking agencies in Marrakech medina.",
+                            notes: "Essential for comfort and safety. Many roads are winding mountain passes."
+                        }
+                    ]
+                });
+            }
+
+            return legs;
+        }
+
+        function generateTips(interests, duration) {
+            const tips = [
+                "Dress modestly outside tourist zones. Shoulders and knees should be covered in medinas and religious sites.",
+                "Carry cash (Moroccan Dirham). ATMs are widely available in cities but scarce in rural and desert areas.",
+                "Bargaining is expected in souks. Start at half the asking price and meet in the middle with a smile.",
+                "Drink only bottled water. Mint tea is offered everywhere as a sign of hospitality — accept it."
+            ];
+            
+            if (interests.includes('desert')) {
+                tips.push("Pack layers for the desert: hot days, surprisingly cold nights. A scarf for sand protection is essential.");
+                tips.push("Book desert camps in advance during peak season (Oct–Apr). Luxury camps fill up fast.");
+            }
+            
+            if (interests.includes('heritage')) {
+                tips.push("Hire an official guide for Fez medina. It's a maze and the stories bring the history alive.");
+            }
+            
+            if (interests.includes('mountains')) {
+                tips.push("Altitude can affect some travelers above 2,000m. Acclimatize for a day in Marrakech first.");
+            }
+            
+            if (duration === 'epic' || duration === 'long') {
+                tips.push("Consider a local SIM card (Maroc Telecom or Orange) for reliable data in remote areas.");
+            }
+            
+            return tips;
+        }
+
+        function generateQuickFacts(duration, locations) {
+            const days = getDaysCount(duration);
+            return [
+                { label: "Duration", value: `${days} days` },
+                { label: "Destinations", value: locations.length },
+                { label: "Best Season", value: "Mar–May, Sep–Nov" },
+                { label: "Currency", value: "Moroccan Dirham (MAD)" },
+                { label: "Language", value: "Arabic, French, Berber" },
+                { label: "Time Zone", value: "UTC+1 (GMT+1)" }
+            ];
+        }
+
+        function renderItineraryDays(days) {
+            const container = document.getElementById('itinerary-days');
+            container.innerHTML = '';
+            
+            days.forEach((dayData, index) => {
+                const el = document.createElement('div');
+                el.className = `itinerary-day bg-white border border-[#E8D5B7] rounded-3xl p-6 flex gap-6`;
+                
+                el.innerHTML = `
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 rounded-2xl bg-[#FEF6ED] flex flex-col items-center justify-center text-center">
+                            <div class="text-[10px] font-medium text-[#C45C26] -mb-0.5">DAY</div>
+                            <div class="font-bold text-2xl leading-none text-[#C45C26]">${dayData.day}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-x-4">
+                            <div>
+                                <div class="font-semibold text-xl tracking-tight">${dayData.title}</div>
+                                <div class="flex items-center gap-x-2 mt-0.5">
+                                    <span class="text-sm text-[#C45C26] font-medium">${dayData.location}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-1.5 justify-end">
+                                ${dayData.tags.map(tag => 
+                                    `<span class="activity-tag">${tag}</span>`
+                                ).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 text-sm">
+                            <div>
+                                <div class="uppercase text-[#C45C26] text-xs tracking-widest font-medium mb-1">Morning</div>
+                                <div class="text-[#0A1628]/90 leading-snug">${dayData.morning}</div>
+                            </div>
+                            <div>
+                                <div class="uppercase text-[#C45C26] text-xs tracking-widest font-medium mb-1">Afternoon</div>
+                                <div class="text-[#0A1628]/90 leading-snug">${dayData.afternoon}</div>
+                            </div>
+                            <div>
+                                <div class="uppercase text-[#C45C26] text-xs tracking-widest font-medium mb-1">Evening</div>
+                                <div class="text-[#0A1628]/90 leading-snug">${dayData.evening}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(el);
+            });
+        }
+
+        function renderTransportation(transportation) {
+            const container = document.getElementById('transportation');
+            container.innerHTML = transportation.map(t => `
+                <div class="flex gap-x-4">
+                    <div class="w-8 flex-shrink-0 pt-0.5">
+                        <i class="fa-solid ${t.icon} text-[#C45C26] text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold">${t.title}</div>
+                        <div class="text-[#0A1628]/75 text-sm leading-snug mt-0.5">${t.desc}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderDetailedTransport(detailedTransport, origin) {
+            let container = document.getElementById('detailed-transport');
+            
+            if (!container) {
+                const transportSection = document.getElementById('transportation').parentElement;
+                container = document.createElement('div');
+                container.id = 'detailed-transport';
+                container.className = 'mt-8';
+                transportSection.appendChild(container);
+            }
+
+            const isUSA = origin && origin.id === 'usa';
+            const title = isUSA 
+                ? 'Detailed Ground Transportation (CMN Arrival Focus)' 
+                : 'Detailed Ground Transportation Options';
+
+            let html = `
+                <div>
+                    <div class="flex items-center gap-x-3 mb-4 px-1">
+                        <i class="fa-solid fa-road text-[#C45C26]"></i>
+                        <h3 class="font-semibold text-xl tracking-tight">${title}</h3>
+                    </div>
+                    <div class="text-xs text-[#0A1628]/60 mb-4 px-1">Practical options with real costs, durations, and booking information</div>
+            `;
+
+            detailedTransport.forEach(leg => {
+                html += `
+                    <div class="bg-white border border-[#E8D5B7] rounded-3xl p-6 mb-5">
+                        <div class="flex items-center gap-x-2 mb-4">
+                            <span class="font-semibold text-lg">${leg.from}</span>
+                            <i class="fa-solid fa-arrow-right text-[#C45C26]"></i>
+                            <span class="font-semibold text-lg">${leg.to}</span>
+                        </div>
+                        
+                        <div class="space-y-4">
+                `;
+
+                leg.options.forEach(opt => {
+                    html += `
+                        <div class="border-l-4 border-[#C45C26] pl-4">
+                            <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                                <div class="font-semibold text-[#0A1628]">${opt.mode}</div>
+                                <div class="text-sm text-[#C45C26] font-medium">${opt.duration}</div>
+                                <div class="text-sm text-[#0A1628]/70">${opt.cost}</div>
+                            </div>
+                            <div class="mt-1.5 text-sm">
+                                <span class="font-medium text-[#0A1628]/80">Where to find / book:</span> 
+                                <span class="text-[#0A1628]/75">${opt.where}</span>
+                            </div>
+                            <div class="mt-1 text-sm text-[#0A1628]/75">
+                                <span class="font-medium text-[#0A1628]/80">Notes:</span> ${opt.notes}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div></div>`;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function renderTravelTips(tips) {
+            const container = document.getElementById('travel-tips');
+            container.innerHTML = tips.map(tip => `
+                <div class="flex gap-x-3">
+                    <div class="text-[#C45C26] mt-1"><i class="fa-solid fa-check-circle"></i></div>
+                    <div class="text-[#0A1628]/90 text-sm leading-snug">${tip}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderQuickFacts(facts) {
+            const container = document.getElementById('quick-facts');
+            container.innerHTML = facts.map(f => `
+                <div>
+                    <div class="text-xs text-white/50">${f.label}</div>
+                    <div class="font-medium text-white text-[15px]">${f.value}</div>
+                </div>
+            `).join('');
+        }
+
+        // NOTE:
+        // The ONLY working map code is the self-contained block inside the generation IIFE
+        // (search for "SELF-CONTAINED MAP"). All previous global map attempts have been removed
+        // to protect the functional version from accidental corruption.
+
+        // editPreferences function removed (button was deleted)
+
+        function printItinerary() {
+            const printWindow = window.open('', '', 'height=800,width=1000');
+            const data = window.currentItinerary;
+            
+            if (!data) {
+                alert("Please generate an itinerary first.");
+                return;
+            }
+            
+            let html = `
+                <html><head><title>Bab Sahara • Your Itinerary</title>
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&amp;family=Inter:wght@400;500;600&amp;display=swap');
+                    body { font-family: Inter, system-ui, sans-serif; padding: 40px 50px; color: #0A1628; line-height: 1.5; }
+                    h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 2.75rem; margin: 0 0 4px; }
+                    .subtitle { color: #666; margin-bottom: 30px; }
+                    .day { margin-bottom: 28px; page-break-inside: avoid; border-bottom: 1px solid #eee; padding-bottom: 22px; }
+                    .day-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+                    .day-num { background: #C45C26; color: white; width: 32px; height: 32px; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+                    .section-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #C45C26; font-weight: 600; }
+                    .map-note { font-size: 11px; color: #777; margin-top: 30px; }
+                </style></head><body>
+                <div style="max-width: 860px; margin: 0 auto;">
+                    <div style="display:flex; align-items:center; gap:12px; margin-bottom: 8px;">
+                        <div style="background:#C45C26; width:32px; height:32px; border-radius:9999px; display:flex; align-items:center; justify-content:center; color:white;">
+                            <span style="font-size:20px;">𐤀</span>
+                        </div>
+                        <span style="font-size:1.65rem; font-weight:700; letter-spacing:-1px;">Bab Sahara</span>
+                    </div>
+                    
+                    <h1>${durationLabels[data.duration]} in Morocco</h1>
+                    <p class="subtitle">Personalized itinerary • ${data.locations.length} destinations</p>
+            `;
+            
+            data.days.forEach(d => {
+                html += `
+                    <div class="day">
+                        <div class="day-header">
+                            <div class="day-num">${d.day}</div>
+                            <div>
+                                <strong style="font-size:1.25rem;">${d.title}</strong><br>
+                                <span style="color:#C45C26; font-size:0.9rem;">${d.location}</span>
+                            </div>
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px; margin-top:14px; font-size:0.9rem;">
+                            <div><div class="section-title">Morning</div>${d.morning}</div>
+                            <div><div class="section-title">Afternoon</div>${d.afternoon}</div>
+                            <div><div class="section-title">Evening</div>${d.evening}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `<div class="map-note">This itinerary was crafted by Bab Sahara. Safe travels through the Kingdom of Morocco.</div></div></body></html>`;
+            
+            printWindow.document.write(html);
+            printWindow.document.close();
+            setTimeout(() => {
+                printWindow.print();
+            }, 450);
+        }
+
+        function scrollToPlanner() {
+            document.getElementById('planner').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Keyboard support & misc
+        function setupKeyboardSupport() {
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    const btn = document.getElementById('generate-btn');
+                    if (!btn.disabled && document.getElementById('step-interests').classList.contains('opacity-40') === false) {
+                        generateItinerary();
+                    }
+                }
+            });
+        }
+
+        // Nav scroll effect
+        function setupNavScroll() {
+            const nav = document.getElementById('nav');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 60) {
+                    nav.classList.add('nav-scrolled', 'shadow-sm');
+                } else {
+                    nav.classList.remove('nav-scrolled', 'shadow-sm');
+                }
+            });
+        }
+
+        // Boot the app
+        function initializeApp() {
+            initializeTailwind();
+            setupKeyboardSupport();
+            setupNavScroll();
+            
+            // Origin options are now static HTML for reliability (dynamic rendering disabled to avoid clearing cards)
+            
+            // Optional: Pre-select reasonable defaults for demo purposes (commented for production feel)
+            // selectDuration('medium', document.querySelector('.duration-btn:nth-child(2)'));
+            
+            // Easter egg: Press "B" to auto-fill a beautiful default itinerary
+            document.addEventListener('keypress', function(e) {
+                if (e.key.toLowerCase() === 'b' && document.getElementById('results').classList.contains('hidden')) {
+                    // Auto-select USA as origin for the demo
+                    const usaOption = originOptions.find(o => o.id === 'usa');
+                    if (usaOption) {
+                        const originCards = document.querySelectorAll('#origin-options .origin-card');
+                        if (originCards[0]) selectOrigin(usaOption, originCards[0]);
+                    }
+                    
+                    setTimeout(() => {
+                        selectDuration('long', document.querySelectorAll('.duration-btn')[2]);
+                    }, 80);
+                    
+                    setTimeout(() => {
+                        const cards = document.querySelectorAll('#step-interests .interest-card');
+                        [0, 1, 3].forEach(i => cards[i].click());
+                        setTimeout(() => {
+                            generateItinerary();
+                        }, 180);
+                    }, 280);
+                }
+            });
+            
+            // Show a friendly hint in console for developers
+            console.log('%c[Bab Sahara] Press "B" on the planner screen for an instant beautiful demo itinerary.', 'color:#C45C26');
+        }
+
+        // Video Modal Functions
+        function openVideoModal() {
+            const modal = document.getElementById('video-modal');
+            const iframe = document.getElementById('video-iframe');
+            
+            // Set the video source (Morocco 4K cinematic film)
+            iframe.src = 'https://www.youtube.com/embed/0RFGsWjHqUc?autoplay=1&rel=0&modestbranding=1';
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden'; // Prevent background scroll
+            
+            // Close on Escape key
+            document.addEventListener('keydown', handleVideoEsc, { once: true });
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('video-modal');
+            const iframe = document.getElementById('video-iframe');
+            
+            // Stop the video by clearing the src
+            iframe.src = '';
+            
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            document.body.style.overflow = ''; // Restore background scroll
+        }
+
+        function handleVideoEsc(e) {
+            if (e.key === 'Escape') {
+                closeVideoModal();
+            }
+        }
+
+        // Launch
+        window.onload = initializeApp;
+    </script>
+    <!-- Video Modal -->
+    <div id="video-modal" onclick="if (event.target.id === 'video-modal') closeVideoModal()" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 cursor-pointer">
+        <div class="w-full max-w-5xl">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between mb-3 px-1">
+                <div>
+                    <div class="text-[#C5A46E] text-xs tracking-[2px] font-semibold">BAB SAHARA PRESENTS</div>
+                    <div class="text-white text-2xl font-semibold tracking-tight">Morocco in 4K — A Cinematic Journey</div>
+                </div>
+                <button onclick="closeVideoModal()" 
+                        class="w-10 h-10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-colors text-2xl leading-none">
+                    &times;
+                </button>
+            </div>
+
+            <!-- Video Container -->
+            <div class="relative w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+                <iframe 
+                    id="video-iframe"
+                    class="absolute top-0 left-0 w-full h-full"
+                    src=""
+                    title="Morocco in 4K | Relaxing Cinematic Travel Film"
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+
+            <div class="mt-4 px-1 text-center">
+                <p class="text-white/60 text-sm">Filmed across Marrakech, the Sahara Desert, Chefchaouen, Essaouira &amp; the High Atlas Mountains</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
